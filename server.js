@@ -1,890 +1,134 @@
-const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
-const sqlite3 = require("sqlite3").verbose();
-const QRCode = require("qrcode");
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(express.static(path.join(__dirname, "public")));
-
-
-
-
-
-/* =========================
-DATABASE
-========================= */
-
-const db = new sqlite3.Database("./noqtashipping.db", (err) => {
-
-if(err){
-
-console.log(err);
-
-}else{
-
-console.log("Database Connected ✅");
-
-}
-
-});
-
-
-
-
-
-/* =========================
-CREATE TABLES
-========================= */
-
-db.serialize(() => {
-
-db.run(`
-
-CREATE TABLE IF NOT EXISTS shipments (
-
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-shipment_number TEXT,
-
-sender_name TEXT,
-sender_phone TEXT,
-sender_address TEXT,
-
-receiver_name TEXT,
-receiver_phone TEXT,
-receiver_address TEXT,
-
-from_city TEXT,
-to_city TEXT,
-
-weight TEXT,
-pieces TEXT,
-
-payment_method TEXT,
-
-price TEXT,
-
-status TEXT,
-
-employee_number TEXT,
-
-qr_code TEXT,
-
-date TEXT,
-time TEXT
-
-)
-
-`);
-
-
-
-
-
-db.run(`
-
-CREATE TABLE IF NOT EXISTS employees (
-
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-employee_number TEXT,
-
-name TEXT,
-
-phone TEXT,
-
-email TEXT,
-
-national_id TEXT,
-
-password TEXT
-
-)
-
-`);
-
-
-
-
-
-db.run(`
-
-CREATE TABLE IF NOT EXISTS customers (
-
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-customer_number TEXT,
-
-name TEXT,
-
-phone TEXT,
-
-phone2 TEXT,
-
-email TEXT,
-
-store_name TEXT,
-
-products TEXT
-
-)
-
-`);
-
-
-
-
-
-db.run(`
-
-CREATE TABLE IF NOT EXISTS services (
-
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-invoice_number TEXT,
-
-service_type TEXT,
-
-customer_name TEXT,
-
-phone TEXT,
-
-details TEXT,
-
-price TEXT,
-
-employee_number TEXT,
-
-date TEXT,
-time TEXT
-
-)
-
-`);
-
-});
-
-
-
-
-
-/* =========================
-GENERATE SHIPMENT NUMBER
-========================= */
-
-function generateShipmentNumber(){
-
-const year = new Date().getFullYear();
-
-const random = Math.floor(
-
-100000 + Math.random() * 900000
-
-);
-
-return `NQ-${year}-${random}`;
-
-}
-
-
-
-
-
-/* =========================
-ADD SHIPMENT
-========================= */
-
-app.post("/add-shipment", async (req, res) => {
-
-const data = req.body;
-
-const shipmentNumber =
-
-generateShipmentNumber();
-
-const trackingUrl =
-
-`https://noqtashipping.onrender.com/tracking.html?shipment=${shipmentNumber}`;
-
-const qrCode =
-
-await QRCode.toDataURL(trackingUrl);
-
-const date = new Date();
-
-db.run(
-
-`INSERT INTO shipments (
-
-shipment_number,
-
-sender_name,
-sender_phone,
-sender_address,
-
-receiver_name,
-receiver_phone,
-receiver_address,
-
-from_city,
-to_city,
-
-weight,
-pieces,
-
-payment_method,
-
-price,
-
-status,
-
-employee_number,
-
-qr_code,
-
-date,
-time
-
-)
-
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-
-[
-shipmentNumber,
-
-data.sender_name,
-data.sender_phone,
-data.sender_address,
-
-data.receiver_name,
-data.receiver_phone,
-data.receiver_address,
-
-data.from_city,
-data.to_city,
-
-data.weight,
-data.pieces,
-
-data.payment_method,
-
-data.price,
-
-"تم الاستلام",
-
-data.employee_number,
-
-qrCode,
-
-date.toLocaleDateString(),
-
-date.toLocaleTimeString()
-
-],
-
-function(err){
-
-if(err){
-
-console.log(err);
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json({
-
-success:true,
-
-shipment_number:
-shipmentNumber,
-
-qr_code:
-qrCode
-
-});
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-GET SHIPMENTS
-========================= */
-
-app.get("/shipments", (req, res) => {
-
-db.all(
-
-"SELECT * FROM shipments ORDER BY id DESC",
-
-[],
-
-(err, rows) => {
-
-if(err){
-
-res.json([]);
-
-}else{
-
-res.json(rows);
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-DELETE SHIPMENT
-========================= */
-
-app.delete("/delete-shipment/:id", (req, res) => {
-
-let id = req.params.id;
-
-db.run(
-
-"DELETE FROM shipments WHERE id = ?",
-
-[id],
-
-function(err){
-
-if(err){
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json({
-success:true
-});
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-UPDATE STATUS
-========================= */
-
-app.put("/update-status/:id", (req, res) => {
-
-let id = req.params.id;
-
-let status = req.body.status;
-
-db.run(
-
-"UPDATE shipments SET status = ? WHERE id = ?",
-
-[status, id],
-
-function(err){
-
-if(err){
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json({
-success:true
-});
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-TRACK SHIPMENT
-========================= */
-
-app.get("/track/:shipment", (req, res) => {
-
-let shipment = req.params.shipment;
-
-db.get(
-
-"SELECT * FROM shipments WHERE shipment_number = ?",
-
-[shipment],
-
-(err, row) => {
-
-if(err){
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json(row);
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-SERVICES
-========================= */
-
-app.post("/add-service", (req, res) => {
-
-const data = req.body;
-
-db.run(
-
-`INSERT INTO services (
-
-invoice_number,
-service_type,
-customer_name,
-phone,
-details,
-price,
-employee_number,
-date,
-time
-
-)
-
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-
-[
-data.invoice_number,
-data.service_type,
-data.customer_name,
-data.phone,
-data.details,
-data.price,
-data.employee_number,
-data.date,
-data.time
-],
-
-function(err){
-
-if(err){
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json({
-success:true
-});
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-app.get("/services", (req, res) => {
-
-db.all(
-
-"SELECT * FROM services ORDER BY id DESC",
-
-[],
-
-(err, rows) => {
-
-if(err){
-
-res.json([]);
-
-}else{
-
-res.json(rows);
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-EMPLOYEES
-========================= */
-
-app.post("/add-employee", (req, res) => {
-
-const data = req.body;
-
-db.run(
-
-`INSERT INTO employees (
-
-employee_number,
-name,
-phone,
-email,
-national_id,
-password
-
-)
-
-VALUES (?, ?, ?, ?, ?, ?)`,
-
-[
-data.employee_number,
-data.name,
-data.phone,
-data.email,
-data.national_id,
-data.password
-],
-
-function(err){
-
-if(err){
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json({
-success:true
-});
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-app.get("/employees", (req, res) => {
-
-db.all(
-
-"SELECT * FROM employees ORDER BY id DESC",
-
-[],
-
-(err, rows) => {
-
-if(err){
-
-res.json([]);
-
-}else{
-
-res.json(rows);
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-CUSTOMERS
-========================= */
-
-app.post("/add-customer", (req, res) => {
-
-const data = req.body;
-
-db.run(
-
-`INSERT INTO customers (
-
-customer_number,
-name,
-phone,
-phone2,
-email,
-store_name,
-products
-
-)
-
-VALUES (?, ?, ?, ?, ?, ?, ?)`,
-
-[
-data.customer_number,
-data.name,
-data.phone,
-data.phone2,
-data.email,
-data.store_name,
-data.products
-],
-
-function(err){
-
-if(err){
-
-res.json({
-success:false
-});
-
-}else{
-
-res.json({
-success:true
-});
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-app.get("/customers", (req, res) => {
-
-db.all(
-
-"SELECT * FROM customers ORDER BY id DESC",
-
-[],
-
-(err, rows) => {
-
-if(err){
-
-res.json([]);
-
-}else{
-
-res.json(rows);
-
-}
-
-}
-
-);
-
-});
-
-
-
-
-
-/* =========================
-STATS
-========================= */
-
-app.get("/stats", (req, res) => {
-
-db.all("SELECT * FROM shipments", [], (err, shipments) => {
-
-db.all("SELECT * FROM services", [], (err2, services) => {
-
-if(err || err2){
-
-res.json({});
-
-}else{
-
-let totalShipments = shipments.length;
-
-let shipmentProfit = 0;
-
-let delivered = 0;
-
-shipments.forEach(shipment => {
-
-shipmentProfit += Number(shipment.price);
-
-if(shipment.status === "تم التسليم"){
-
-delivered++;
-
-}
-
-});
-
-let packagingProfit = 0;
-
-let deliveryProfit = 0;
-
-let storageProfit = 0;
-
-services.forEach(service => {
-
-if(service.service_type === "تغليف"){
-
-packagingProfit += Number(service.price);
-
-}
-
-if(
-
-service.service_type === "جلب + توصيل"
-
-||
-
-service.service_type === "توصيل فقط"
-
-){
-
-deliveryProfit += Number(service.price);
-
-}
-
-if(service.service_type === "احتفاظ بالشحنة"){
-
-storageProfit += Number(service.price);
-
-}
-
-});
-
-let totalProfit =
-
-shipmentProfit
-+
-packagingProfit
-+
-deliveryProfit
-+
-storageProfit;
-
-res.json({
-
-totalShipments,
-
-shipmentProfit,
-
-packagingProfit,
-
-deliveryProfit,
-
-storageProfit,
-
-totalProfit,
-
-delivered
-
-});
-
-}
-
-});
-
-});
-
-});
-
-
-
-
-
-/* =========================
-ROOT
-========================= */
-
-app.get("/", (req, res) => {
-
-res.sendFile(
-
-path.join(__dirname, "public", "index.html")
-
-);
-
-});
-
-
-
-
-
-/* =========================
-SERVER
-========================= */
-
 const PORT = process.env.PORT || 3000;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static('public'));
+
+const DB_FILE = './shipments.json';
+
+let shipments = [];
+
+if (fs.existsSync(DB_FILE)) {
+    shipments = JSON.parse(fs.readFileSync(DB_FILE));
+}
+
+function saveShipments() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(shipments, null, 2));
+}
+
+app.get('/api/shipments', (req, res) => {
+    res.json(shipments);
+});
+
+app.get('/api/shipments/:id', (req, res) => {
+
+    const shipment = shipments.find(
+        s => s.shipmentNumber == req.params.id
+    );
+
+    if (!shipment) {
+        return res.status(404).json({
+            success: false,
+            message: 'الشحنة غير موجودة'
+        });
+    }
+
+    res.json(shipment);
+});
+
+app.post('/api/shipments', (req, res) => {
+
+    try {
+
+        const shipmentNumber =
+            'HB-2026-' +
+            String(shipments.length + 1).padStart(4, '0');
+
+        const shipment = {
+
+            id: Date.now(),
+
+            shipmentNumber,
+
+            senderName: req.body.senderName || '',
+            senderPhone: req.body.senderPhone || '',
+            senderCity: req.body.senderCity || '',
+
+            receiverName: req.body.receiverName || '',
+            receiverPhone: req.body.receiverPhone || '',
+            receiverCity: req.body.receiverCity || '',
+
+            pieces: req.body.pieces || 1,
+            weight: req.body.weight || 1,
+            price: req.body.price || 0,
+
+            status: 'جديدة',
+
+            createdAt: new Date().toLocaleString('ar-SA')
+        };
+
+        shipments.push(shipment);
+
+        saveShipments();
+
+        res.json({
+            success: true,
+            shipment
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(500).json({
+            success: false,
+            message: 'حدث خطأ'
+        });
+    }
+});
+
+app.put('/api/shipments/:id/status', (req, res) => {
+
+    const shipment = shipments.find(
+        s => s.shipmentNumber == req.params.id
+    );
+
+    if (!shipment) {
+        return res.status(404).json({
+            success: false
+        });
+    }
+
+    shipment.status = req.body.status;
+
+    saveShipments();
+
+    res.json({
+        success: true
+    });
+});
+
+app.get('/shipment/:id', (req, res) => {
+
+    res.sendFile(
+        path.join(__dirname, 'public', 'shipment.html')
+    );
+});
+
+app.get('*', (req, res) => {
+
+    res.sendFile(
+        path.join(__dirname, 'public', 'index.html')
+    );
+});
+
 app.listen(PORT, () => {
-
-console.log("Noqta Shipping Running 🚚");
-
+    console.log(`Server running on port ${PORT}`);
 });
