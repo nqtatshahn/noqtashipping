@@ -1,27 +1,28 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>إضافة شحنة</title>
 
 <style>
 
 body{
-margin:0;
 background:#111;
 font-family:Tahoma;
+direction:rtl;
 color:white;
+padding:20px;
 }
 
 .container{
-width:90%;
-max-width:1000px;
+max-width:700px;
 margin:auto;
-padding:20px;
 }
 
 h1{
@@ -29,13 +30,13 @@ text-align:center;
 color:#f6b32d;
 }
 
-.grid{
+form{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
 gap:15px;
 }
 
 input,
+select,
 button{
 
 padding:15px;
@@ -45,7 +46,8 @@ font-size:16px;
 
 }
 
-input{
+input,
+select{
 background:#222;
 color:white;
 }
@@ -69,74 +71,92 @@ cursor:pointer;
 📦 إضافة شحنة
 </h1>
 
-<div class="grid">
+<form id="shipmentForm">
 
-<input id="senderName" placeholder="اسم المرسل">
+<input type="text"
+id="sender_name"
+placeholder="اسم المرسل"
+required>
 
-<input id="senderPhone" placeholder="جوال المرسل">
+<input type="text"
+id="sender_phone"
+placeholder="جوال المرسل"
+required>
 
-<input id="senderCity" placeholder="مدينة الإرسال">
+<input type="text"
+id="receiver_name"
+placeholder="اسم المستلم"
+required>
 
-<input id="receiverName" placeholder="اسم المستلم">
+<input type="text"
+id="receiver_phone"
+placeholder="جوال المستلم"
+required>
 
-<input id="receiverPhone" placeholder="جوال المستلم">
+<input type="text"
+id="from_city"
+placeholder="مدينة الإرسال"
+required>
 
-<input id="receiverCity" placeholder="مدينة التسليم">
+<input type="text"
+id="to_city"
+placeholder="مدينة التسليم"
+required>
 
-<input id="pieces" type="number" placeholder="عدد القطع">
+<input type="number"
+id="weight"
+placeholder="الوزن"
+required>
 
-<input id="weight" type="number" placeholder="الوزن">
+<input type="number"
+id="pieces"
+placeholder="عدد القطع"
+required>
 
-<input id="price" type="number" placeholder="السعر">
+<input type="number"
+id="price"
+placeholder="السعر"
+required>
 
-</div>
+<select id="payment_method">
 
-<button onclick="addShipment()">
+<option value="كاش">
+كاش
+</option>
+
+<option value="تحويل">
+تحويل
+</option>
+
+<option value="شبكة">
+شبكة
+</option>
+
+</select>
+
+<button type="submit">
 
 ➕ إضافة الشحنة
 
 </button>
 
+</form>
+
 </div>
 
 <script>
 
-async function addShipment(){
+document.getElementById("shipmentForm")
 
-const data = {
+.addEventListener("submit",
 
-senderName:
-document.getElementById("senderName").value,
+async function(e){
 
-senderPhone:
-document.getElementById("senderPhone").value,
+e.preventDefault();
 
-senderCity:
-document.getElementById("senderCity").value,
+let response = await fetch(
 
-receiverName:
-document.getElementById("receiverName").value,
-
-receiverPhone:
-document.getElementById("receiverPhone").value,
-
-receiverCity:
-document.getElementById("receiverCity").value,
-
-pieces:
-document.getElementById("pieces").value,
-
-weight:
-document.getElementById("weight").value,
-
-price:
-document.getElementById("price").value
-
-};
-
-const response = await fetch(
-
-"/api/shipments",
+"/add-shipment",
 
 {
 
@@ -146,39 +166,64 @@ headers:{
 "Content-Type":"application/json"
 },
 
-body:JSON.stringify(data)
+body:JSON.stringify({
+
+sender_name:
+document.getElementById("sender_name").value,
+
+sender_phone:
+document.getElementById("sender_phone").value,
+
+receiver_name:
+document.getElementById("receiver_name").value,
+
+receiver_phone:
+document.getElementById("receiver_phone").value,
+
+from_city:
+document.getElementById("from_city").value,
+
+to_city:
+document.getElementById("to_city").value,
+
+weight:
+document.getElementById("weight").value,
+
+pieces:
+document.getElementById("pieces").value,
+
+price:
+document.getElementById("price").value,
+
+payment_method:
+document.getElementById("payment_method").value,
+
+employee_number:
+localStorage.getItem("employee")
+
+})
 
 }
 
 );
 
-const result = await response.json();
+let result = await response.json();
 
 if(result.success){
 
-localStorage.setItem(
+alert("✅ تمت إضافة الشحنة");
 
-"shipment",
-
-JSON.stringify(result.shipment)
-
-);
-
-window.open(
-
-"/shipment-label.html",
-
-"_blank"
-
-);
+document.getElementById("shipmentForm").reset();
 
 }else{
 
-alert("حدث خطأ");
+alert("❌ حدث خطأ");
+
+console.log(result);
 
 }
 
-}
+});
 
 </script>
 
