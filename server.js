@@ -7,6 +7,7 @@ const QRCode = require("qrcode");
 const app = express();
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -37,7 +38,7 @@ console.log("Database Connected ✅");
 
 
 /* =========================
-TABLES
+CREATE TABLES
 ========================= */
 
 db.serialize(() => {
@@ -58,16 +59,21 @@ receiver_name TEXT,
 receiver_phone TEXT,
 receiver_address TEXT,
 
-weight INTEGER,
-pieces INTEGER,
+from_city TEXT,
+to_city TEXT,
+
+weight TEXT,
+pieces TEXT,
 
 payment_method TEXT,
 
-price INTEGER,
+price TEXT,
 
 status TEXT,
 
 employee_number TEXT,
+
+qr_code TEXT,
 
 date TEXT,
 time TEXT
@@ -75,6 +81,10 @@ time TEXT
 )
 
 `);
+
+
+
+
 
 db.run(`
 
@@ -97,6 +107,10 @@ password TEXT
 )
 
 `);
+
+
+
+
 
 db.run(`
 
@@ -122,6 +136,10 @@ products TEXT
 
 `);
 
+
+
+
+
 db.run(`
 
 CREATE TABLE IF NOT EXISTS services (
@@ -138,12 +156,11 @@ phone TEXT,
 
 details TEXT,
 
-price INTEGER,
+price TEXT,
 
 employee_number TEXT,
 
 date TEXT,
-
 time TEXT
 
 )
@@ -157,47 +174,48 @@ time TEXT
 
 
 /* =========================
-QR
+GENERATE SHIPMENT NUMBER
 ========================= */
 
-app.post("/generate-qr", async (req, res) => {
+function generateShipmentNumber(){
 
-let shipmentNumber = req.body.shipment_number;
+const year = new Date().getFullYear();
 
-let trackingUrl =
+const random = Math.floor(
 
-`https://noqtashipping.onrender.com/tracking.html?shipment=${shipmentNumber}`;
+100000 + Math.random() * 900000
 
-try{
+);
 
-let qrImage = await QRCode.toDataURL(trackingUrl);
-
-res.json({
-success:true,
-qr:qrImage
-});
-
-}catch{
-
-res.json({
-success:false
-});
+return `NQ-${year}-${random}`;
 
 }
-
-});
 
 
 
 
 
 /* =========================
-SHIPMENTS
+ADD SHIPMENT
 ========================= */
 
-app.post("/add-shipment", (req, res) => {
+app.post("/add-shipment", async (req, res) => {
 
 const data = req.body;
+
+const shipmentNumber =
+
+generateShipmentNumber();
+
+const trackingUrl =
+
+`https://noqtashipping.onrender.com/tracking.html?shipment=${shipmentNumber}`;
+
+const qrCode =
+
+await QRCode.toDataURL(trackingUrl);
+
+const date = new Date();
 
 db.run(
 
@@ -213,6 +231,9 @@ receiver_name,
 receiver_phone,
 receiver_address,
 
+from_city,
+to_city,
+
 weight,
 pieces,
 
@@ -224,15 +245,17 @@ status,
 
 employee_number,
 
+qr_code,
+
 date,
 time
 
 )
 
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
 [
-data.shipment_number,
+shipmentNumber,
 
 data.sender_name,
 data.sender_phone,
@@ -242,6 +265,9 @@ data.receiver_name,
 data.receiver_phone,
 data.receiver_address,
 
+data.from_city,
+data.to_city,
+
 data.weight,
 data.pieces,
 
@@ -249,12 +275,16 @@ data.payment_method,
 
 data.price,
 
-data.status,
+"تم الاستلام",
 
 data.employee_number,
 
-data.date,
-data.time
+qrCode,
+
+date.toLocaleDateString(),
+
+date.toLocaleTimeString()
+
 ],
 
 function(err){
@@ -270,7 +300,15 @@ success:false
 }else{
 
 res.json({
-success:true
+
+success:true,
+
+shipment_number:
+shipmentNumber,
+
+qr_code:
+qrCode
+
 });
 
 }
@@ -284,6 +322,10 @@ success:true
 
 
 
+
+/* =========================
+GET SHIPMENTS
+========================= */
 
 app.get("/shipments", (req, res) => {
 
@@ -314,6 +356,10 @@ res.json(rows);
 
 
 
+
+/* =========================
+DELETE SHIPMENT
+========================= */
 
 app.delete("/delete-shipment/:id", (req, res) => {
 
@@ -351,6 +397,10 @@ success:true
 
 
 
+/* =========================
+UPDATE STATUS
+========================= */
+
 app.put("/update-status/:id", (req, res) => {
 
 let id = req.params.id;
@@ -376,6 +426,44 @@ success:false
 res.json({
 success:true
 });
+
+}
+
+}
+
+);
+
+});
+
+
+
+
+
+/* =========================
+TRACK SHIPMENT
+========================= */
+
+app.get("/track/:shipment", (req, res) => {
+
+let shipment = req.params.shipment;
+
+db.get(
+
+"SELECT * FROM shipments WHERE shipment_number = ?",
+
+[shipment],
+
+(err, row) => {
+
+if(err){
+
+res.json({
+success:false
+});
+
+}else{
+
+res.json(row);
 
 }
 
@@ -430,8 +518,6 @@ data.time
 function(err){
 
 if(err){
-
-console.log(err);
 
 res.json({
 success:false
@@ -687,7 +773,7 @@ let delivered = 0;
 
 shipments.forEach(shipment => {
 
-shipmentProfit += shipment.price;
+shipmentProfit += Number(shipment.price);
 
 if(shipment.status === "تم التسليم"){
 
@@ -707,7 +793,7 @@ services.forEach(service => {
 
 if(service.service_type === "تغليف"){
 
-packagingProfit += service.price;
+packagingProfit += Number(service.price);
 
 }
 
@@ -721,13 +807,13 @@ service.service_type === "توصيل فقط"
 
 ){
 
-deliveryProfit += service.price;
+deliveryProfit += Number(service.price);
 
 }
 
 if(service.service_type === "احتفاظ بالشحنة"){
 
-storageProfit += service.price;
+storageProfit += Number(service.price);
 
 }
 
@@ -779,7 +865,11 @@ ROOT
 
 app.get("/", (req, res) => {
 
-res.sendFile(path.join(__dirname, "public", "index.html"));
+res.sendFile(
+
+path.join(__dirname, "public", "index.html")
+
+);
 
 });
 
