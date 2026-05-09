@@ -4,7 +4,9 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>لوحة التحكم | نقطة شحن</title>
 
@@ -20,7 +22,59 @@
 🚚 نقطة شحن
 </div>
 
-<ul class="menu">
+<ul class="menu" id="menu">
+
+</ul>
+
+</div>
+
+<div class="main">
+
+<h1 id="welcomeText">
+مرحباً 👋
+</h1>
+
+<div class="cards">
+
+<div class="card">
+<h2>عدد الشحنات</h2>
+<p id="shipmentsCount">0</p>
+</div>
+
+<div class="card">
+<h2>إجمالي الأرباح</h2>
+<p id="totalProfit">0</p>
+</div>
+
+<div class="card">
+<h2>تم التسليم</h2>
+<p id="delivered">0</p>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function buildMenu(){
+
+let employee =
+localStorage.getItem("employee");
+
+let menu =
+document.getElementById("menu");
+
+
+
+
+/* =========================
+ADMIN
+========================= */
+
+if(employee === "admin"){
+
+menu.innerHTML = `
 
 <li onclick="window.location.href='dashboard.html'">
 🏠 الرئيسية
@@ -28,10 +82,6 @@
 
 <li onclick="window.location.href='shipments.html'">
 📦 إضافة شحنة
-</li>
-
-<li onclick="window.location.href='shipments-list.html'">
-📋 قائمة الشحنات
 </li>
 
 <li onclick="window.location.href='shipments-list.html'">
@@ -70,58 +120,59 @@
 🚪 تسجيل الخروج
 </li>
 
-</ul>
+`;
 
-</div>
+}
 
-<div class="main">
 
-<h1 id="welcomeText">
-مرحباً 👋
-</h1>
 
-<div class="cards">
 
-<div class="card">
-<h2>عدد الشحنات</h2>
-<p id="shipmentsCount">0</p>
-</div>
+/* =========================
+EMPLOYEE
+========================= */
 
-<div class="card">
-<h2>أرباح الشحن</h2>
-<p id="shipmentProfit">0</p>
-</div>
+else{
 
-<div class="card">
-<h2>أرباح التغليف</h2>
-<p id="packagingProfit">0</p>
-</div>
+menu.innerHTML = `
 
-<div class="card">
-<h2>أرباح التوصيل</h2>
-<p id="deliveryProfit">0</p>
-</div>
+<li onclick="window.location.href='dashboard.html'">
+🏠 الرئيسية
+</li>
 
-<div class="card">
-<h2>أرباح الاحتفاظ</h2>
-<p id="storageProfit">0</p>
-</div>
+<li onclick="window.location.href='shipments.html'">
+📦 إضافة شحنة
+</li>
 
-<div class="card">
-<h2>إجمالي الأرباح</h2>
-<p id="totalProfit">0</p>
-</div>
+<li onclick="window.location.href='shipments-list.html'">
+✏️ تعديل حالة الشحنات
+</li>
 
-<div class="card">
-<h2>تم التسليم</h2>
-<p id="delivered">0</p>
-</div>
+<li onclick="window.location.href='packaging.html'">
+📦 التغليف
+</li>
 
-</div>
+<li onclick="window.location.href='delivery.html'">
+🚚 التوصيل والاحتفاظ
+</li>
 
-</div>
+<li onclick="window.location.href='tracking.html'">
+📍 تتبع الشحنات
+</li>
 
-<script>
+<li onclick="logout()">
+🚪 تسجيل الخروج
+</li>
+
+`;
+
+}
+
+}
+
+
+
+
+
 
 async function loadStats(){
 
@@ -130,45 +181,45 @@ let response = await fetch("/stats");
 let stats = await response.json();
 
 document.getElementById("shipmentsCount").innerText =
-stats.totalShipments;
 
-document.getElementById("shipmentProfit").innerText =
-stats.shipmentProfit + " ر.س";
-
-document.getElementById("packagingProfit").innerText =
-stats.packagingProfit + " ر.س";
-
-document.getElementById("deliveryProfit").innerText =
-stats.deliveryProfit + " ر.س";
-
-document.getElementById("storageProfit").innerText =
-stats.storageProfit + " ر.س";
+stats.totalShipments || 0;
 
 document.getElementById("totalProfit").innerText =
-stats.totalProfit + " ر.س";
+
+(stats.totalProfit || 0) + " ر.س";
 
 document.getElementById("delivered").innerText =
-stats.delivered;
+
+stats.delivered || 0;
 
 }
+
+
+
+
+
 
 async function loadEmployee(){
 
 let employeeNumber =
+
 localStorage.getItem("employee");
 
 if(employeeNumber === "admin"){
 
 document.getElementById("welcomeText").innerText =
+
 "مرحباً فيصل 👋";
 
 return;
 
 }
 
-let response = await fetch("/employees");
+let response =
+await fetch("/employees");
 
-let employees = await response.json();
+let employees =
+await response.json();
 
 let employee = employees.find(emp =>
 
@@ -179,11 +230,17 @@ emp.employee_number == employeeNumber
 if(employee){
 
 document.getElementById("welcomeText").innerText =
+
 "مرحباً " + employee.name + " 👋";
 
 }
 
 }
+
+
+
+
+
 
 function logout(){
 
@@ -193,6 +250,13 @@ window.location.href = "index.html";
 
 }
 
+
+
+
+
+
+buildMenu();
+
 loadStats();
 
 loadEmployee();
@@ -200,4 +264,5 @@ loadEmployee();
 </script>
 
 </body>
+
 </html>
