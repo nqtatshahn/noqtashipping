@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
@@ -8,150 +8,82 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>بوليصة الشحن | نقطة شحن</title>
+<title>بوليصة الشحن</title>
 
 <style>
 
 body{
-margin:0;
-padding:20px;
 background:#f3f3f3;
 font-family:Tahoma;
-direction:rtl;
+padding:20px;
 }
 
-.label{
+.card{
 
 max-width:420px;
 margin:auto;
 background:white;
-border-radius:20px;
 padding:20px;
-box-shadow:0 0 15px rgba(0,0,0,.1);
+border-radius:20px;
+box-shadow:0 0 10px rgba(0,0,0,.1);
 
 }
 
 .logo{
 
 text-align:center;
-font-size:35px;
+font-size:30px;
 font-weight:bold;
-color:#d89b00;
-margin-bottom:20px;
+color:#f6b32d;
 
 }
 
-.shipment-number{
+.number{
 
 background:#f6b32d;
 color:white;
 padding:15px;
 border-radius:15px;
 text-align:center;
-font-size:26px;
+font-size:24px;
 font-weight:bold;
-
-}
-
-.section{
-
-display:flex;
-gap:10px;
 margin-top:20px;
 
 }
 
 .box{
 
-flex:1;
 background:#faf7ef;
 padding:15px;
 border-radius:15px;
-text-align:center;
+margin-top:15px;
 
 }
 
 .title{
 
-font-size:18px;
 font-weight:bold;
 margin-bottom:10px;
-color:#777;
 
 }
 
-.value{
-
-font-size:22px;
-font-weight:bold;
-
-}
-
-.small{
-
-font-size:18px;
-margin-top:10px;
-
-}
-
-.qr{
-
-text-align:center;
-margin-top:30px;
-
-}
-
-.qr img{
-
-width:160px;
-
-}
-
-.barcode{
-
-text-align:center;
-font-size:40px;
-letter-spacing:5px;
-margin-top:20px;
-
-}
-
-.footer{
-
-text-align:center;
-margin-top:25px;
-font-size:18px;
-color:#666;
-
-}
-
-.print-btn{
+.print{
 
 width:100%;
 padding:15px;
-border:none;
 background:#f6b32d;
 color:white;
-font-size:20px;
-font-weight:bold;
+border:none;
 border-radius:15px;
-margin-top:25px;
-cursor:pointer;
+font-size:18px;
+margin-top:20px;
 
 }
 
 @media print{
 
-.print-btn{
-
+.print{
 display:none;
-
-}
-
-body{
-
-background:white;
-
 }
 
 }
@@ -162,20 +94,16 @@ background:white;
 
 <body>
 
-<div class="label">
+<div class="card">
 
 <div class="logo">
 🚚 نقطة شحن
 </div>
 
-<div class="shipment-number"
+<div class="number"
 id="shipmentNumber">
 
-NQ-2026-000001
-
 </div>
-
-<div class="section">
 
 <div class="box">
 
@@ -183,22 +111,102 @@ NQ-2026-000001
 المرسل
 </div>
 
-<div class="value"
-id="senderName">
-
-فيصل
-
-</div>
-
-<div class="small"
-id="senderPhone">
-
-0500000000
-
-</div>
+<div id="sender"></div>
 
 </div>
 
 <div class="box">
 
-<div
+<div class="title">
+المستلم
+</div>
+
+<div id="receiver"></div>
+
+</div>
+
+<div class="box">
+
+<div class="title">
+تفاصيل الشحنة
+</div>
+
+<div id="details"></div>
+
+</div>
+
+<button class="print"
+onclick="window.print()">
+
+🖨️ طباعة
+
+</button>
+
+</div>
+
+<script>
+
+const shipment =
+
+JSON.parse(localStorage.getItem("shipment"));
+
+if(shipment){
+
+document.getElementById("shipmentNumber").innerText =
+
+shipment.shipmentNumber;
+
+document.getElementById("sender").innerHTML =
+
+shipment.senderName
++
+"<br>"
++
+shipment.senderPhone
++
+"<br>"
++
+shipment.senderCity;
+
+document.getElementById("receiver").innerHTML =
+
+shipment.receiverName
++
+"<br>"
++
+shipment.receiverPhone
++
+"<br>"
++
+shipment.receiverCity;
+
+document.getElementById("details").innerHTML =
+
+"الوزن: "
++
+shipment.weight
++
+"<br>"
+
++
+"القطع: "
++
+shipment.pieces
+
++
+"<br>"
+
++
+"السعر: "
++
+shipment.price
++
+" ر.س";
+
+}
+
+</script>
+
+</body>
+
+</html>
