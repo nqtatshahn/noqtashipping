@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>تقارير الموظفين | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:#1c1c1c;
+color:white;
+border-radius:15px;
+overflow:hidden;
+}
+
+th, td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #333;
+}
+
+th{
+background:#FFD700;
+color:black;
+}
+
+.best{
+background:#FFD700;
+color:black;
+padding:10px;
+border-radius:12px;
+margin-bottom:20px;
+font-weight:bold;
+display:inline-block;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>📊 تقارير الموظفين</h1>
+
+<div class="best" id="bestEmployee">
+
+🏆 أفضل موظف:
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>الرقم الوظيفي</th>
+
+<th>عدد الشحنات</th>
+
+<th>إجمالي الأرباح</th>
+
+<th>تم التسليم</th>
+
+</tr>
+
+</thead>
+
+<tbody id="reportsTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+async function loadReports(){
+
+let shipmentsResponse =
+await fetch("/shipments");
+
+let shipments =
+await shipmentsResponse.json();
+
+let employeesResponse =
+await fetch("/employees");
+
+let employees =
+await employeesResponse.json();
+
+let reports = {};
+
+shipments.forEach(shipment => {
+
+let emp = shipment.employee_number;
+
+if(!reports[emp]){
+
+reports[emp] = {
+
+shipments:0,
+profits:0,
+delivered:0
+
+};
+
+}
+
+reports[emp].shipments++;
+
+reports[emp].profits += shipment.price;
+
+if(shipment.status === "تم التسليم"){
+
+reports[emp].delivered++;
+
+}
+
+});
+
+let bestEmployee = "";
+let maxShipments = 0;
+
+let table =
+document.getElementById("reportsTable");
+
+table.innerHTML = "";
+
+for(let emp in reports){
+
+if(reports[emp].shipments > maxShipments){
+
+maxShipments = reports[emp].shipments;
+
+bestEmployee = emp;
+
+}
+
+table.innerHTML += `
+
+<tr>
+
+<td>${emp}</td>
+
+<td>${reports[emp].shipments}</td>
+
+<td>${reports[emp].profits} ريال</td>
+
+<td>${reports[emp].delivered}</td>
+
+</tr>
+
+`;
+
+}
+
+let employeeName = bestEmployee;
+
+if(bestEmployee !== "admin"){
+
+let employee =
+employees.find(e =>
+e.employee_number == bestEmployee
+);
+
+if(employee){
+
+employeeName = employee.name;
+
+}
+
+}else{
+
+employeeName = "فيصل";
+
+}
+
+document.getElementById("bestEmployee")
+.innerHTML =
+
+"🏆 أفضل موظف: " + employeeName;
+
+}
+
+loadReports();
+
+</script>
+
+</body>
+</html>

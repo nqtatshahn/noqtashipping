@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>تتبع الشحنة | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.track-box{
+max-width:700px;
+margin:auto;
+background:#1c1c1c;
+padding:30px;
+border-radius:20px;
+box-shadow:0 0 15px rgba(255,215,0,0.1);
+}
+
+.track-box input{
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#2c2c2c;
+color:white;
+font-size:16px;
+}
+
+.track-box button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#FFD700;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.result{
+margin-top:20px;
+background:#111;
+padding:20px;
+border-radius:15px;
+}
+
+.info{
+margin-bottom:10px;
+font-size:16px;
+}
+
+.status{
+background:#FFD700;
+color:black;
+padding:10px;
+border-radius:10px;
+display:inline-block;
+font-weight:bold;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>📍 تتبع الشحنة</h1>
+
+<div class="track-box">
+
+<input
+type="text"
+id="search"
+placeholder="رقم الشحنة أو رقم الجوال"
+>
+
+<button onclick="trackShipment()">
+بحث
+</button>
+
+<div class="result" id="result">
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function trackShipment(){
+
+let search =
+document.getElementById("search").value;
+
+let response = await fetch("/shipments");
+
+let shipments = await response.json();
+
+let shipment = shipments.find(item =>
+
+item.shipment_number === search
+
+||
+
+item.sender_phone === search
+
+||
+
+item.receiver_phone === search
+
+);
+
+if(shipment){
+
+document.getElementById("result").innerHTML = `
+
+<div class="info">
+📦 رقم الشحنة:
+${shipment.shipment_number}
+</div>
+
+<div class="info">
+📤 المرسل:
+${shipment.sender_name}
+</div>
+
+<div class="info">
+📞 جوال المرسل:
+${shipment.sender_phone}
+</div>
+
+<div class="info">
+📍 عنوان المرسل:
+${shipment.sender_address}
+</div>
+
+<hr>
+
+<div class="info">
+📥 المستلم:
+${shipment.receiver_name}
+</div>
+
+<div class="info">
+📞 جوال المستلم:
+${shipment.receiver_phone}
+</div>
+
+<div class="info">
+📍 عنوان المستلم:
+${shipment.receiver_address}
+</div>
+
+<hr>
+
+<div class="info">
+📅 التاريخ:
+${shipment.date}
+</div>
+
+<div class="info">
+⏰ الوقت:
+${shipment.time}
+</div>
+
+<div class="info">
+💰 المبلغ:
+${shipment.price} ريال
+</div>
+
+<div class="status">
+🚚 ${shipment.status}
+</div>
+
+`;
+
+}else{
+
+document.getElementById("result").innerHTML = `
+
+<div class="status">
+❌ الشحنة غير موجودة
+</div>
+
+`;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

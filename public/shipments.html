@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>إضافة شحنة | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.form-box{
+background:#1c1c1c;
+padding:30px;
+border-radius:20px;
+max-width:700px;
+margin:auto;
+box-shadow:0 0 15px rgba(255,215,0,0.1);
+}
+
+.form-box input,
+.form-box select{
+
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#2c2c2c;
+color:white;
+font-size:16px;
+}
+
+.form-box button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#FFD700;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.result{
+margin-top:20px;
+background:#111;
+padding:20px;
+border-radius:15px;
+color:white;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>📦 إضافة شحنة جديدة</h1>
+
+<div class="form-box">
+
+<input type="text" id="sender" placeholder="اسم المرسل">
+
+<input type="text" id="senderPhone" placeholder="جوال المرسل">
+
+<input type="text" id="senderAddress" placeholder="عنوان المرسل">
+
+<input type="text" id="receiver" placeholder="اسم المستلم">
+
+<input type="text" id="receiverPhone" placeholder="جوال المستلم">
+
+<input type="text" id="receiverAddress" placeholder="عنوان المستلم">
+
+<input type="number" id="weight" placeholder="الوزن بالكيلو">
+
+<input type="number" id="pieces" placeholder="عدد القطع">
+
+<select id="payment">
+
+<option value="sender">
+الدفع على المرسل
+</option>
+
+<option value="receiver">
+الدفع على المستلم
+</option>
+
+</select>
+
+<button onclick="createShipment()">
+إضافة الشحنة
+</button>
+
+<div class="result" id="result">
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function createShipment(){
+
+let sender = document.getElementById("sender").value;
+
+let senderPhone = document.getElementById("senderPhone").value;
+
+let senderAddress = document.getElementById("senderAddress").value;
+
+let receiver = document.getElementById("receiver").value;
+
+let receiverPhone = document.getElementById("receiverPhone").value;
+
+let receiverAddress = document.getElementById("receiverAddress").value;
+
+let weight = Number(document.getElementById("weight").value);
+
+let pieces = Number(document.getElementById("pieces").value);
+
+let payment = document.getElementById("payment").value;
+
+let employee =
+localStorage.getItem("employee");
+
+let price = payment === "sender" ? 60 : 110;
+
+if(weight > 15){
+
+price += (weight - 15) * 3;
+
+}
+
+price += pieces * 8;
+
+let shipmentNumber =
+"NQ" + Math.floor(10000 + Math.random() * 90000);
+
+let date = new Date();
+
+let shipmentData = {
+
+shipment_number: shipmentNumber,
+
+sender_name: sender,
+
+sender_phone: senderPhone,
+
+sender_address: senderAddress,
+
+receiver_name: receiver,
+
+receiver_phone: receiverPhone,
+
+receiver_address: receiverAddress,
+
+weight: weight,
+
+pieces: pieces,
+
+payment_method: payment,
+
+price: price,
+
+status: "جديدة",
+
+employee_number: employee,
+
+date: date.toLocaleDateString(),
+
+time: date.toLocaleTimeString()
+
+};
+
+let response = await fetch("/add-shipment", {
+
+method: "POST",
+
+headers: {
+
+"Content-Type": "application/json"
+
+},
+
+body: JSON.stringify(shipmentData)
+
+});
+
+let result = await response.json();
+
+document.getElementById("result").innerHTML = `
+
+<h2>✅ تم حفظ الشحنة</h2>
+
+<p><b>رقم الشحنة:</b> ${shipmentNumber}</p>
+
+<p><b>الموظف:</b> ${employee}</p>
+
+<p><b>السعر:</b> ${price} ريال</p>
+
+<p><b>الحالة:</b> جديدة</p>
+
+`;
+
+}
+
+</script>
+
+</body>
+</html>

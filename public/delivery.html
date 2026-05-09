@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>التوصيل والاحتفاظ | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.form-box{
+background:#1c1c1c;
+padding:30px;
+border-radius:20px;
+max-width:700px;
+margin:auto;
+box-shadow:0 0 15px rgba(255,215,0,0.1);
+margin-bottom:30px;
+}
+
+.form-box input,
+.form-box select{
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#2c2c2c;
+color:white;
+font-size:16px;
+}
+
+.form-box button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#FFD700;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.price-box{
+background:#FFD700;
+color:black;
+padding:15px;
+border-radius:12px;
+font-size:20px;
+font-weight:bold;
+margin-bottom:15px;
+text-align:center;
+}
+
+.result{
+background:#111;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+color:white;
+}
+
+.print-btn{
+background:#FFD700;
+color:black;
+padding:12px;
+border:none;
+border-radius:10px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+margin-top:15px;
+width:100%;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#1c1c1c;
+color:white;
+border-radius:15px;
+overflow:hidden;
+margin-top:30px;
+}
+
+th, td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #333;
+}
+
+th{
+background:#FFD700;
+color:black;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>🚚 التوصيل والاحتفاظ</h1>
+
+<div class="form-box">
+
+<input
+type="text"
+id="customerName"
+placeholder="اسم العميل"
+>
+
+<input
+type="text"
+id="phone"
+placeholder="رقم الجوال"
+>
+
+<select
+id="service"
+onchange="calculateDeliveryPrice()"
+>
+
+<option value="">
+اختر الخدمة
+</option>
+
+<option value="pickup_delivery">
+جلب من شركة + توصيل منزل
+</option>
+
+<option value="delivery_only">
+توصيل شحنة محتفظ بها
+</option>
+
+<option value="storage">
+احتفاظ بالشحنة
+</option>
+
+</select>
+
+<div class="price-box" id="priceBox">
+
+المبلغ: 0 ريال
+
+</div>
+
+<button onclick="addDelivery()">
+
+حفظ العملية
+
+</button>
+
+<div class="result" id="result">
+
+</div>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>رقم الفاتورة</th>
+
+<th>العميل</th>
+
+<th>الخدمة</th>
+
+<th>المبلغ</th>
+
+<th>الموظف</th>
+
+</tr>
+
+</thead>
+
+<tbody id="deliveryTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let deliveryList = [];
+
+function calculateDeliveryPrice(){
+
+let service =
+document.getElementById("service").value;
+
+let total = 0;
+
+if(service === "pickup_delivery"){
+
+total = 25;
+
+}
+
+if(service === "delivery_only"){
+
+total = 15;
+
+}
+
+if(service === "storage"){
+
+total = 4;
+
+}
+
+document.getElementById("priceBox").innerText =
+
+"المبلغ: " + total + " ريال";
+
+}
+
+async function addDelivery(){
+
+let service =
+document.getElementById("service").value;
+
+let total = 0;
+
+let serviceName = "";
+
+if(service === "pickup_delivery"){
+
+total = 25;
+
+serviceName = "جلب + توصيل";
+
+}
+
+if(service === "delivery_only"){
+
+total = 15;
+
+serviceName = "توصيل فقط";
+
+}
+
+if(service === "storage"){
+
+total = 4;
+
+serviceName = "احتفاظ بالشحنة";
+
+}
+
+let invoiceNumber =
+"INV" + Math.floor(10000 + Math.random() * 90000);
+
+let date = new Date();
+
+let delivery = {
+
+invoice_number: invoiceNumber,
+
+service_type: serviceName,
+
+customer_name:
+document.getElementById("customerName").value,
+
+phone:
+document.getElementById("phone").value,
+
+details:
+serviceName,
+
+price:
+total,
+
+employee_number:
+localStorage.getItem("employee"),
+
+date:
+date.toLocaleDateString(),
+
+time:
+date.toLocaleTimeString()
+
+};
+
+await fetch("/add-service", {
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body: JSON.stringify(delivery)
+
+});
+
+deliveryList.push(delivery);
+
+loadDelivery();
+
+document.getElementById("result").innerHTML = `
+
+<h2>✅ تم حفظ الفاتورة</h2>
+
+<p><b>رقم الفاتورة:</b>
+${invoiceNumber}</p>
+
+<p><b>الخدمة:</b>
+${serviceName}</p>
+
+<p><b>المبلغ:</b>
+${total} ريال</p>
+
+<button class="print-btn"
+onclick="printInvoice('${invoiceNumber}')">
+
+🖨️ طباعة الفاتورة
+
+</button>
+
+`;
+
+}
+
+function loadDelivery(){
+
+let table =
+document.getElementById("deliveryTable");
+
+table.innerHTML = "";
+
+deliveryList.forEach(item => {
+
+table.innerHTML += `
+
+<tr>
+
+<td>${item.invoice_number}</td>
+
+<td>${item.customer_name}</td>
+
+<td>${item.service_type}</td>
+
+<td>${item.price} ريال</td>
+
+<td>${item.employee_number}</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+function printInvoice(invoice){
+
+window.print();
+
+}
+
+</script>
+
+</body>
+
+</html>

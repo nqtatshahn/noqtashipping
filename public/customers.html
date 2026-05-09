@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>العملاء | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.form-box{
+background:#1c1c1c;
+padding:30px;
+border-radius:20px;
+max-width:700px;
+margin:auto;
+box-shadow:0 0 15px rgba(255,215,0,0.1);
+margin-bottom:30px;
+}
+
+.form-box input{
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#2c2c2c;
+color:white;
+font-size:16px;
+}
+
+.form-box button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#FFD700;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#1c1c1c;
+color:white;
+border-radius:15px;
+overflow:hidden;
+}
+
+th, td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #333;
+}
+
+th{
+background:#FFD700;
+color:black;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>👥 العملاء</h1>
+
+<div class="form-box">
+
+<input type="text" id="name" placeholder="اسم العميل">
+
+<input type="text" id="phone" placeholder="رقم الجوال">
+
+<input type="text" id="phone2" placeholder="رقم جوال إضافي">
+
+<input type="text" id="email" placeholder="البريد الإلكتروني">
+
+<input type="text" id="store" placeholder="اسم المتجر">
+
+<input type="text" id="products" placeholder="أنواع المنتجات">
+
+<button onclick="addCustomer()">
+إضافة عميل
+</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>رقم العميل</th>
+
+<th>الاسم</th>
+
+<th>الجوال</th>
+
+<th>المتجر</th>
+
+<th>المنتجات</th>
+
+</tr>
+
+</thead>
+
+<tbody id="customersTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+async function addCustomer(){
+
+let customer = {
+
+customer_number:
+"MD" + Math.floor(1000 + Math.random() * 9000),
+
+name:
+document.getElementById("name").value,
+
+phone:
+document.getElementById("phone").value,
+
+phone2:
+document.getElementById("phone2").value,
+
+email:
+document.getElementById("email").value,
+
+store_name:
+document.getElementById("store").value,
+
+products:
+document.getElementById("products").value
+
+};
+
+await fetch("/add-customer", {
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body: JSON.stringify(customer)
+
+});
+
+loadCustomers();
+
+}
+
+async function loadCustomers(){
+
+let response = await fetch("/customers");
+
+let customers = await response.json();
+
+let table = document.getElementById("customersTable");
+
+table.innerHTML = "";
+
+customers.forEach(customer => {
+
+table.innerHTML += `
+
+<tr>
+
+<td>${customer.customer_number}</td>
+
+<td>${customer.name}</td>
+
+<td>${customer.phone}</td>
+
+<td>${customer.store_name}</td>
+
+<td>${customer.products}</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+loadCustomers();
+
+</script>
+
+</body>
+</html>

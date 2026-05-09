@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>أرشيف الفواتير | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.search-box{
+margin-bottom:20px;
+}
+
+.search-box input{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#1c1c1c;
+color:white;
+font-size:16px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#1c1c1c;
+color:white;
+border-radius:15px;
+overflow:hidden;
+}
+
+th, td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #333;
+}
+
+th{
+background:#FFD700;
+color:black;
+}
+
+.print-btn{
+background:#FFD700;
+color:black;
+padding:8px 12px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>🧾 أرشيف الفواتير</h1>
+
+<div class="search-box">
+
+<input
+type="text"
+id="search"
+placeholder="بحث برقم الفاتورة..."
+onkeyup="searchInvoices()"
+>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>رقم الفاتورة</th>
+
+<th>الخدمة</th>
+
+<th>العميل</th>
+
+<th>المبلغ</th>
+
+<th>الموظف</th>
+
+<th>التاريخ</th>
+
+<th>طباعة</th>
+
+</tr>
+
+</thead>
+
+<tbody id="invoicesTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let allInvoices = [];
+
+async function loadInvoices(){
+
+let response =
+await fetch("/services");
+
+allInvoices =
+await response.json();
+
+displayInvoices(allInvoices);
+
+}
+
+function displayInvoices(invoices){
+
+let table =
+document.getElementById("invoicesTable");
+
+table.innerHTML = "";
+
+invoices.forEach(invoice => {
+
+table.innerHTML += `
+
+<tr>
+
+<td>${invoice.invoice_number}</td>
+
+<td>${invoice.service_type}</td>
+
+<td>${invoice.customer_name}</td>
+
+<td>${invoice.price} ريال</td>
+
+<td>${invoice.employee_number}</td>
+
+<td>${invoice.date}</td>
+
+<td>
+
+<button class="print-btn"
+onclick="printInvoice('${invoice.invoice_number}')">
+
+🖨️ طباعة
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+function searchInvoices(){
+
+let search =
+document.getElementById("search")
+.value
+.toLowerCase();
+
+let filtered = allInvoices.filter(invoice => {
+
+return invoice.invoice_number
+.toLowerCase()
+.includes(search);
+
+});
+
+displayInvoices(filtered);
+
+}
+
+function printInvoice(invoice){
+
+window.print();
+
+}
+
+loadInvoices();
+
+</script>
+
+</body>
+
+</html>

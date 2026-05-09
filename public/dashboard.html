@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>لوحة التحكم | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<div class="logo">
+🚚 نقطة شحن
+</div>
+
+<ul class="menu">
+
+<li onclick="window.location.href='dashboard.html'">
+🏠 الرئيسية
+</li>
+
+<li onclick="window.location.href='shipments.html'">
+📦 إضافة شحنة
+</li>
+
+<li onclick="window.location.href='shipments-list.html'">
+📋 قائمة الشحنات
+</li>
+
+<li onclick="window.location.href='shipments-list.html'">
+✏️ تعديل حالة الشحنات
+</li>
+
+<li onclick="window.location.href='employees.html'">
+👨‍💼 الموظفين
+</li>
+
+<li onclick="window.location.href='customers.html'">
+👥 العملاء
+</li>
+
+<li onclick="window.location.href='packaging.html'">
+📦 التغليف
+</li>
+
+<li onclick="window.location.href='delivery.html'">
+🚚 التوصيل والاحتفاظ
+</li>
+
+<li onclick="window.location.href='tracking.html'">
+📍 تتبع الشحنات
+</li>
+
+<li onclick="window.location.href='reports.html'">
+📊 التقارير
+</li>
+
+<li onclick="window.location.href='invoices.html'">
+🧾 الفواتير
+</li>
+
+<li onclick="logout()">
+🚪 تسجيل الخروج
+</li>
+
+</ul>
+
+</div>
+
+<div class="main">
+
+<h1 id="welcomeText">
+مرحباً 👋
+</h1>
+
+<div class="cards">
+
+<div class="card">
+<h2>عدد الشحنات</h2>
+<p id="shipmentsCount">0</p>
+</div>
+
+<div class="card">
+<h2>أرباح الشحن</h2>
+<p id="shipmentProfit">0</p>
+</div>
+
+<div class="card">
+<h2>أرباح التغليف</h2>
+<p id="packagingProfit">0</p>
+</div>
+
+<div class="card">
+<h2>أرباح التوصيل</h2>
+<p id="deliveryProfit">0</p>
+</div>
+
+<div class="card">
+<h2>أرباح الاحتفاظ</h2>
+<p id="storageProfit">0</p>
+</div>
+
+<div class="card">
+<h2>إجمالي الأرباح</h2>
+<p id="totalProfit">0</p>
+</div>
+
+<div class="card">
+<h2>تم التسليم</h2>
+<p id="delivered">0</p>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+async function loadStats(){
+
+let response = await fetch("/stats");
+
+let stats = await response.json();
+
+document.getElementById("shipmentsCount").innerText =
+stats.totalShipments;
+
+document.getElementById("shipmentProfit").innerText =
+stats.shipmentProfit + " ر.س";
+
+document.getElementById("packagingProfit").innerText =
+stats.packagingProfit + " ر.س";
+
+document.getElementById("deliveryProfit").innerText =
+stats.deliveryProfit + " ر.س";
+
+document.getElementById("storageProfit").innerText =
+stats.storageProfit + " ر.س";
+
+document.getElementById("totalProfit").innerText =
+stats.totalProfit + " ر.س";
+
+document.getElementById("delivered").innerText =
+stats.delivered;
+
+}
+
+async function loadEmployee(){
+
+let employeeNumber =
+localStorage.getItem("employee");
+
+if(employeeNumber === "admin"){
+
+document.getElementById("welcomeText").innerText =
+"مرحباً فيصل 👋";
+
+return;
+
+}
+
+let response = await fetch("/employees");
+
+let employees = await response.json();
+
+let employee = employees.find(emp =>
+
+emp.employee_number == employeeNumber
+
+);
+
+if(employee){
+
+document.getElementById("welcomeText").innerText =
+"مرحباً " + employee.name + " 👋";
+
+}
+
+}
+
+function logout(){
+
+localStorage.removeItem("employee");
+
+window.location.href = "index.html";
+
+}
+
+loadStats();
+
+loadEmployee();
+
+</script>
+
+</body>
+</html>

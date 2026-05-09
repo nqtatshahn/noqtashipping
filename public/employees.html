@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>إدارة الموظفين | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+.form-box{
+background:#1c1c1c;
+padding:30px;
+border-radius:20px;
+max-width:700px;
+margin:auto;
+box-shadow:0 0 15px rgba(255,215,0,0.1);
+margin-bottom:30px;
+}
+
+.form-box input{
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#2c2c2c;
+color:white;
+font-size:16px;
+}
+
+.form-box button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#FFD700;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:#1c1c1c;
+color:white;
+border-radius:15px;
+overflow:hidden;
+}
+
+th, td{
+padding:15px;
+text-align:center;
+border-bottom:1px solid #333;
+}
+
+th{
+background:#FFD700;
+color:black;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="main">
+
+<h1>👨‍💼 إدارة الموظفين</h1>
+
+<div class="form-box">
+
+<input type="text" id="name" placeholder="اسم الموظف">
+
+<input type="text" id="phone" placeholder="رقم الجوال">
+
+<input type="text" id="email" placeholder="البريد الإلكتروني">
+
+<input type="text" id="nationalId" placeholder="رقم الهوية / الإقامة">
+
+<input type="password" id="password" placeholder="كلمة المرور">
+
+<button onclick="addEmployee()">
+إضافة موظف
+</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>الرقم الوظيفي</th>
+
+<th>الاسم</th>
+
+<th>الجوال</th>
+
+<th>البريد</th>
+
+<th>الهوية</th>
+
+</tr>
+
+</thead>
+
+<tbody id="employeesTable">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+async function addEmployee(){
+
+let employee = {
+
+employee_number:
+Math.floor(10000 + Math.random() * 90000),
+
+name:
+document.getElementById("name").value,
+
+phone:
+document.getElementById("phone").value,
+
+email:
+document.getElementById("email").value,
+
+national_id:
+document.getElementById("nationalId").value,
+
+password:
+document.getElementById("password").value
+
+};
+
+await fetch("/add-employee", {
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body: JSON.stringify(employee)
+
+});
+
+loadEmployees();
+
+}
+
+async function loadEmployees(){
+
+let response = await fetch("/employees");
+
+let employees = await response.json();
+
+let table = document.getElementById("employeesTable");
+
+table.innerHTML = "";
+
+employees.forEach(emp => {
+
+table.innerHTML += `
+
+<tr>
+
+<td>${emp.employee_number}</td>
+
+<td>${emp.name}</td>
+
+<td>${emp.phone}</td>
+
+<td>${emp.email}</td>
+
+<td>${emp.national_id}</td>
+
+</tr>
+
+`;
+
+});
+
+}
+
+loadEmployees();
+
+</script>
+
+</body>
+</html>
