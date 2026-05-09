@@ -10,7 +10,80 @@ content="width=device-width, initial-scale=1.0">
 
 <title>إضافة شحنة | نقطة شحن</title>
 
-<link rel="stylesheet" href="style.css">
+<style>
+
+body{
+
+margin:0;
+padding:0;
+background:#111;
+font-family:Tahoma;
+direction:rtl;
+color:white;
+
+}
+
+.container{
+
+width:95%;
+max-width:900px;
+margin:auto;
+padding:20px;
+
+}
+
+h1{
+
+text-align:center;
+margin-bottom:30px;
+color:#f6b32d;
+
+}
+
+form{
+
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:15px;
+
+}
+
+input,
+select,
+button{
+
+padding:15px;
+border:none;
+border-radius:10px;
+font-size:16px;
+
+}
+
+input,
+select{
+
+background:#222;
+color:white;
+
+}
+
+button{
+
+background:#f6b32d;
+color:white;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+button:hover{
+
+opacity:.9;
+
+}
+
+</style>
 
 </head>
 
@@ -72,6 +145,11 @@ id="pieces"
 placeholder="عدد القطع"
 required>
 
+<input type="number"
+id="price"
+placeholder="السعر"
+readonly>
+
 <select id="payment_method">
 
 <option value="كاش">
@@ -88,11 +166,6 @@ required>
 
 </select>
 
-<input type="number"
-id="price"
-placeholder="السعر"
-required>
-
 <button type="submit">
 
 ➕ إضافة الشحنة
@@ -104,6 +177,55 @@ required>
 </div>
 
 <script>
+
+
+
+
+/* =========================
+AUTO PRICE
+========================= */
+
+document.getElementById("weight")
+
+.addEventListener("input", calculatePrice);
+
+document.getElementById("pieces")
+
+.addEventListener("input", calculatePrice);
+
+function calculatePrice(){
+
+let weight =
+
+Number(
+document.getElementById("weight").value
+);
+
+let pieces =
+
+Number(
+document.getElementById("pieces").value
+);
+
+let price = 0;
+
+price += weight * 10;
+
+price += pieces * 5;
+
+document.getElementById("price").value =
+
+price;
+
+}
+
+
+
+
+
+/* =========================
+ADD SHIPMENT
+========================= */
 
 document.getElementById("shipmentForm")
 
@@ -146,11 +268,11 @@ document.getElementById("weight").value;
 let pieces =
 document.getElementById("pieces").value;
 
-let payment_method =
-document.getElementById("payment_method").value;
-
 let price =
 document.getElementById("price").value;
+
+let payment_method =
+document.getElementById("payment_method").value;
 
 let employee_number =
 localStorage.getItem("employee");
