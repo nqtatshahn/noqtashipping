@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>بوليصة الشحن | نقطة شحن</title>
+
+<style>
+
+body{
+margin:0;
+padding:20px;
+background:#f3f3f3;
+font-family:Tahoma;
+direction:rtl;
+}
+
+.label{
+
+max-width:420px;
+margin:auto;
+background:white;
+border-radius:20px;
+padding:20px;
+box-shadow:0 0 15px rgba(0,0,0,.1);
+
+}
+
+.logo{
+
+text-align:center;
+font-size:35px;
+font-weight:bold;
+color:#d89b00;
+margin-bottom:20px;
+
+}
+
+.shipment-number{
+
+background:#f6b32d;
+color:white;
+padding:15px;
+border-radius:15px;
+text-align:center;
+font-size:26px;
+font-weight:bold;
+
+}
+
+.section{
+
+display:flex;
+gap:10px;
+margin-top:20px;
+
+}
+
+.box{
+
+flex:1;
+background:#faf7ef;
+padding:15px;
+border-radius:15px;
+text-align:center;
+
+}
+
+.title{
+
+font-size:18px;
+font-weight:bold;
+margin-bottom:10px;
+color:#777;
+
+}
+
+.value{
+
+font-size:22px;
+font-weight:bold;
+
+}
+
+.small{
+
+font-size:18px;
+margin-top:10px;
+
+}
+
+.qr{
+
+text-align:center;
+margin-top:30px;
+
+}
+
+.qr img{
+
+width:160px;
+
+}
+
+.barcode{
+
+text-align:center;
+font-size:40px;
+letter-spacing:5px;
+margin-top:20px;
+
+}
+
+.footer{
+
+text-align:center;
+margin-top:25px;
+font-size:18px;
+color:#666;
+
+}
+
+.print-btn{
+
+width:100%;
+padding:15px;
+border:none;
+background:#f6b32d;
+color:white;
+font-size:20px;
+font-weight:bold;
+border-radius:15px;
+margin-top:25px;
+cursor:pointer;
+
+}
+
+@media print{
+
+.print-btn{
+
+display:none;
+
+}
+
+body{
+
+background:white;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="label">
+
+<div class="logo">
+🚚 نقطة شحن
+</div>
+
+<div class="shipment-number"
+id="shipmentNumber">
+
+NQ-2026-000001
+
+</div>
+
+<div class="section">
+
+<div class="box">
+
+<div class="title">
+المرسل
+</div>
+
+<div class="value"
+id="senderName">
+
+فيصل
+
+</div>
+
+<div class="small"
+id="senderPhone">
+
+0500000000
+
+</div>
+
+</div>
+
+<div class="box">
+
+<div
