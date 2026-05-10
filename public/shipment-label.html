@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>بوليصة الشحنة</title>
+
+<style>
+
+body{
+font-family:Tahoma;
+background:#f5f5f5;
+padding:20px;
+}
+
+.card{
+max-width:400px;
+margin:auto;
+background:white;
+padding:20px;
+border-radius:20px;
+box-shadow:0 0 10px rgba(0,0,0,.1);
+}
+
+h1{
+text-align:center;
+color:#f6b32d;
+}
+
+.box{
+background:#fafafa;
+padding:15px;
+border-radius:10px;
+margin-top:15px;
+}
+
+button{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#f6b32d;
+color:white;
+font-size:18px;
+margin-top:20px;
+cursor:pointer;
+}
+
+@media print{
+button{
+display:none;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>
+🚚 نقطة شحن
+</h1>
+
+<div class="box" id="shipmentData">
+
+</div>
+
+<button onclick="window.print()">
+
+🖨️ طباعة
+
+</button>
+
+</div>
+
+<script>
+
+const shipment = JSON.parse(
+
+localStorage.getItem("shipment")
+
+);
+
+if(shipment){
+
+document.getElementById(
+
+"shipmentData"
+
+).innerHTML =
+
+`
+
+رقم الشحنة:
+<b>${shipment.id}</b>
+
+<hr>
+
+المرسل:
+${shipment.sender_name}
+
+<br><br>
+
+المستلم:
+${shipment.receiver_name}
+
+<br><br>
+
+من:
+${shipment.from_city}
+
+<br><br>
+
+إلى:
+${shipment.to_city}
+
+<br><br>
+
+الوزن:
+${shipment.weight}
+
+<br><br>
+
+القطع:
+${shipment.pieces}
+
+<br><br>
+
+السعر:
+${shipment.price}
+
+`;
+
+}
+
+</script>
+
+</body>
+
+</html>
