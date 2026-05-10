@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>قائمة الشحنات</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:20px;
+    background:#111;
+    color:white;
+    font-family:tahoma;
+}
+
+h1{
+    text-align:center;
+    color:#ffb300;
+    margin-bottom:30px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#1c1c1c;
+    overflow:hidden;
+    border-radius:10px;
+}
+
+th{
+    background:#ffb300;
+    color:black;
+    padding:15px;
+}
+
+td{
+    padding:12px;
+    text-align:center;
+    border-bottom:1px solid #333;
+}
+
+select{
+    padding:8px;
+    border-radius:6px;
+}
+
+.print-btn{
+    background:#4caf50;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>📦 قائمة الشحنات</h1>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>رقم الشحنة</th>
+<th>المرسل</th>
+<th>المستلم</th>
+<th>السعر</th>
+<th>الحالة</th>
+<th>التاريخ</th>
+<th>طباعة</th>
+
+</tr>
+
+</thead>
+
+<tbody id="shipmentsTable"></tbody>
+
+</table>
+
+<script>
+
+async function loadShipments(){
+
+    const response = await fetch("/shipments");
+
+    const shipments = await response.json();
+
+    const table = document.getElementById("shipmentsTable");
+
+    table.innerHTML = "";
+
+    shipments.forEach(shipment => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>${shipment.shipmentNumber}</td>
+
+            <td>${shipment.senderName}</td>
+
+            <td>${shipment.receiverName}</td>
+
+            <td>${shipment.price} ريال</td>
+
+            <td>${shipment.status}</td>
+
+            <td>${shipment.date}</td>
+
+            <td>
+
+                <button
+                class="print-btn"
+                onclick="printShipment('${shipment.shipmentNumber}')">
+
+                طباعة
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+function printShipment(number){
+
+    window.location.href =
+    "/shipment-label.html?number=" + number;
+
+}
+
+loadShipments();
+
+</script>
+
+</body>
+</html>

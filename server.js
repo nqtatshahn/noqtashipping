@@ -1,6 +1,5 @@
 const express = require("express");
 const fs = require("fs");
-const path = require("path");
 
 const app = express();
 
@@ -9,17 +8,48 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(express.static("public"));
 
-const dataPath = "./data/shipments.json";
+
+
+/* =========================
+   ملف البيانات
+========================= */
 
 if (!fs.existsSync("./data")) {
   fs.mkdirSync("./data");
 }
 
-if (!fs.existsSync(dataPath)) {
-  fs.writeFileSync(dataPath, "[]");
+if (!fs.existsSync("./data/shipments.json")) {
+  fs.writeFileSync("./data/shipments.json", "[]");
 }
 
-let shipments = JSON.parse(fs.readFileSync(dataPath));
+
+
+/* =========================
+   قراءة البيانات
+========================= */
+
+function getShipments() {
+
+  return JSON.parse(
+    fs.readFileSync("./data/shipments.json")
+  );
+
+}
+
+
+
+/* =========================
+   حفظ البيانات
+========================= */
+
+function saveShipments(data) {
+
+  fs.writeFileSync(
+    "./data/shipments.json",
+    JSON.stringify(data, null, 2)
+  );
+
+}
 
 
 
@@ -32,17 +62,21 @@ app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   if (username === "admin" && password === "1234") {
+
     return res.json({
       success: true,
       role: "admin"
     });
+
   }
 
   if (username === "employee" && password === "1234") {
+
     return res.json({
       success: true,
       role: "employee"
     });
+
   }
 
   res.json({
@@ -61,21 +95,7 @@ app.post("/add-shipment", (req, res) => {
 
   try {
 
-    const {
-
-      senderName,
-      senderPhone,
-      senderCity,
-
-      receiverName,
-      receiverPhone,
-      receiverCity,
-
-      pieces,
-      weight,
-      price
-
-    } = req.body;
+    const shipments = getShipments();
 
     const shipmentNumber =
       "HB-2026-" +
@@ -83,33 +103,101 @@ app.post("/add-shipment", (req, res) => {
 
     const newShipment = {
 
+      shipmentNumber:
+
       shipmentNumber,
 
-      senderName,
-      senderPhone,
-      senderCity,
 
-      receiverName,
-      receiverPhone,
-      receiverCity,
 
-      pieces,
-      weight,
-      price,
+      senderName:
 
-      status: "جديدة",
+      req.body.senderName,
 
-      date: new Date().toLocaleDateString("ar-SA"),
-      time: new Date().toLocaleTimeString("ar-SA")
+
+
+      senderPhone:
+
+      req.body.senderPhone,
+
+
+
+      senderCity:
+
+      req.body.senderCity,
+
+
+
+      receiverName:
+
+      req.body.receiverName,
+
+
+
+      receiverPhone:
+
+      req.body.receiverPhone,
+
+
+
+      receiverCity:
+
+      req.body.receiverCity,
+
+
+
+      pieces:
+
+      req.body.pieces,
+
+
+
+      weight:
+
+      req.body.weight,
+
+
+
+      price:
+
+      req.body.price,
+
+
+
+      packaging:
+
+      req.body.packaging,
+
+
+
+      deliveryType:
+
+      req.body.deliveryType,
+
+
+
+      status:
+
+      "جديدة",
+
+
+
+      date:
+
+      new Date().toLocaleDateString("ar-SA"),
+
+
+
+      time:
+
+      new Date().toLocaleTimeString("ar-SA")
 
     };
 
+
+
     shipments.push(newShipment);
 
-    fs.writeFileSync(
-      dataPath,
-      JSON.stringify(shipments, null, 2)
-    );
+    saveShipments(shipments);
 
     res.json({
       success: true,
@@ -136,9 +224,7 @@ app.post("/add-shipment", (req, res) => {
 
 app.get("/shipments", (req, res) => {
 
-  shipments = JSON.parse(fs.readFileSync(dataPath));
-
-  res.json(shipments);
+  res.json(getShipments());
 
 });
 
@@ -150,22 +236,24 @@ app.get("/shipments", (req, res) => {
 
 app.post("/update-status", (req, res) => {
 
-  const { shipmentNumber, status } = req.body;
+  const shipments = getShipments();
 
-  shipments = shipments.map(shipment => {
+  const updated = shipments.map(shipment => {
 
-    if (shipment.shipmentNumber === shipmentNumber) {
-      shipment.status = status;
+    if (
+      shipment.shipmentNumber ===
+      req.body.shipmentNumber
+    ) {
+
+      shipment.status = req.body.status;
+
     }
 
     return shipment;
 
   });
 
-  fs.writeFileSync(
-    dataPath,
-    JSON.stringify(shipments, null, 2)
-  );
+  saveShipments(updated);
 
   res.json({
     success: true
@@ -181,16 +269,18 @@ app.post("/update-status", (req, res) => {
 
 app.post("/delete-shipment", (req, res) => {
 
-  const { shipmentNumber } = req.body;
+  const shipments = getShipments();
 
-  shipments = shipments.filter(
-    shipment => shipment.shipmentNumber !== shipmentNumber
+  const filtered = shipments.filter(
+
+    shipment =>
+
+    shipment.shipmentNumber !==
+    req.body.shipmentNumber
+
   );
 
-  fs.writeFileSync(
-    dataPath,
-    JSON.stringify(shipments, null, 2)
-  );
+  saveShipments(filtered);
 
   res.json({
     success: true
@@ -207,5 +297,9 @@ app.post("/delete-shipment", (req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+
+  console.log(
+    "Server running on port " + PORT
+  );
+
 });
