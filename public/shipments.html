@@ -1,69 +1,78 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
 
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>إضافة شحنة | نقطة شحن</title>
 
 <style>
 
 body{
-background:#111;
-font-family:Tahoma;
-direction:rtl;
-color:white;
-padding:20px;
-margin:0;
-}
-
-.container{
-max-width:700px;
-margin:auto;
+    margin:0;
+    padding:20px;
+    background:#111;
+    color:white;
+    font-family:tahoma;
 }
 
 h1{
-text-align:center;
-color:#f6b32d;
-margin-bottom:30px;
+    text-align:center;
+    margin-bottom:30px;
+    color:#ffb300;
 }
 
 form{
-display:grid;
-gap:15px;
+    max-width:1100px;
+    margin:auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
 }
 
-input,
-select,
-button{
-
-padding:15px;
-border:none;
-border-radius:10px;
-font-size:16px;
-
-}
-
-input,
-select{
-background:#222;
-color:white;
+input,select{
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
 }
 
 button{
-background:#f6b32d;
-color:white;
-font-weight:bold;
-cursor:pointer;
-font-size:18px;
+    background:#ff9800;
+    color:white;
+    border:none;
+    padding:15px;
+    border-radius:10px;
+    font-size:18px;
+    cursor:pointer;
 }
 
 button:hover{
-opacity:.9;
+    background:#e68900;
+}
+
+.top-buttons{
+    max-width:1100px;
+    margin:auto;
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.top-buttons a{
+    background:#222;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
+}
+
+.top-buttons a:hover{
+    background:#333;
 }
 
 </style>
@@ -72,175 +81,176 @@ opacity:.9;
 
 <body>
 
-<div class="container">
+<h1>📦 إضافة شحنة</h1>
 
-<h1>
-📦 إضافة شحنة
-</h1>
+<div class="top-buttons">
+
+<a href="/list.html">قائمة الشحنات</a>
+
+<a href="/tracking.html">تتبع الشحنات</a>
+
+<a href="/packaging.html">التغليف</a>
+
+<a href="/delivery.html">التوصيل والاحتفاظ</a>
+
+</div>
 
 <form id="shipmentForm">
 
-<input type="text"
-id="sender_name"
-placeholder="اسم المرسل"
-required>
+<input type="text" id="senderName" placeholder="اسم المرسل" required>
 
-<input type="text"
-id="sender_phone"
-placeholder="جوال المرسل"
-required>
+<input type="text" id="senderPhone" placeholder="رقم المرسل" required>
 
-<input type="text"
-id="receiver_name"
-placeholder="اسم المستلم"
-required>
+<input type="text" id="senderCity" placeholder="عنوان المرسل" required>
 
-<input type="text"
-id="receiver_phone"
-placeholder="جوال المستلم"
-required>
+<input type="text" id="receiverName" placeholder="اسم المستلم" required>
 
-<input type="text"
-id="from_city"
-placeholder="مدينة الإرسال"
-required>
+<input type="text" id="receiverPhone" placeholder="رقم المستلم" required>
 
-<input type="text"
-id="to_city"
-placeholder="مدينة التسليم"
-required>
+<input type="text" id="receiverCity" placeholder="عنوان المستلم" required>
 
-<input type="number"
-id="weight"
-placeholder="الوزن"
-required>
+<input type="number" id="pieces" placeholder="عدد القطع" required>
 
-<input type="number"
-id="pieces"
-placeholder="عدد القطع"
-required>
+<input type="number" id="weight" placeholder="الوزن بالكيلو" required>
 
-<input type="number"
-id="price"
-placeholder="السعر"
-required>
+<input type="number" id="price" placeholder="السعر" readonly>
 
-<select id="payment_method">
+<select id="packaging">
 
-<option value="كاش">
-كاش
-</option>
+<option value="بدون">تغليف بدون</option>
 
-<option value="تحويل">
-تحويل
-</option>
+<option value="عادي">تغليف عادي</option>
 
-<option value="شبكة">
-شبكة
-</option>
+<option value="ممتاز">تغليف ممتاز</option>
+
+</select>
+
+<select id="deliveryType">
+
+<option value="توصيل">توصيل</option>
+
+<option value="احتفاظ">احتفاظ</option>
 
 </select>
 
 <button type="submit">
-
-➕ إضافة الشحنة
-
+إضافة الشحنة
 </button>
 
 </form>
 
-</div>
-
 <script>
 
+const piecesInput = document.getElementById("pieces");
+const weightInput = document.getElementById("weight");
+const priceInput = document.getElementById("price");
+
+
+
+/* =========================
+   حساب السعر تلقائي
+========================= */
+
+function calculatePrice(){
+
+    const pieces = Number(piecesInput.value) || 0;
+
+    const weight = Number(weightInput.value) || 0;
+
+    let total = 0;
+
+    total += pieces * 10;
+
+    total += weight * 5;
+
+    priceInput.value = total;
+
+}
+
+piecesInput.addEventListener("input", calculatePrice);
+
+weightInput.addEventListener("input", calculatePrice);
+
+
+
+/* =========================
+   إضافة الشحنة
+========================= */
+
 document.getElementById("shipmentForm")
+.addEventListener("submit", async function(e){
 
-.addEventListener("submit",
+    e.preventDefault();
 
-async function(e){
+    const shipmentData = {
 
-e.preventDefault();
+        senderName:
+        document.getElementById("senderName").value,
 
-try{
+        senderPhone:
+        document.getElementById("senderPhone").value,
 
-let response = await fetch(
+        senderCity:
+        document.getElementById("senderCity").value,
 
-"/add-shipment",
+        receiverName:
+        document.getElementById("receiverName").value,
 
-{
+        receiverPhone:
+        document.getElementById("receiverPhone").value,
 
-method:"POST",
+        receiverCity:
+        document.getElementById("receiverCity").value,
 
-headers:{
-"Content-Type":"application/json"
-},
+        pieces:
+        document.getElementById("pieces").value,
 
-body:JSON.stringify({
+        weight:
+        document.getElementById("weight").value,
 
-sender_name:
-document.getElementById("sender_name").value,
+        price:
+        document.getElementById("price").value,
 
-sender_phone:
-document.getElementById("sender_phone").value,
+        packaging:
+        document.getElementById("packaging").value,
 
-receiver_name:
-document.getElementById("receiver_name").value,
+        deliveryType:
+        document.getElementById("deliveryType").value
 
-receiver_phone:
-document.getElementById("receiver_phone").value,
+    };
 
-from_city:
-document.getElementById("from_city").value,
+    const response = await fetch("/add-shipment", {
 
-to_city:
-document.getElementById("to_city").value,
+        method:"POST",
 
-weight:
-document.getElementById("weight").value,
+        headers:{
+            "Content-Type":"application/json"
+        },
 
-pieces:
-document.getElementById("pieces").value,
+        body:JSON.stringify(shipmentData)
 
-price:
-document.getElementById("price").value,
+    });
 
-payment_method:
-document.getElementById("payment_method").value
+    const result = await response.json();
 
-})
+    if(result.success){
 
-}
+        alert(
+            "تم إضافة الشحنة رقم: " +
+            result.shipmentNumber
+        );
 
-);
+        window.location.href = "/list.html";
 
-let result = await response.json();
+    }else{
 
-if(result.success){
+        alert("حدث خطأ");
 
-alert("✅ تمت إضافة الشحنة");
-
-document.getElementById("shipmentForm").reset();
-
-}else{
-
-alert("❌ حدث خطأ");
-
-console.log(result);
-
-}
-
-}catch(err){
-
-console.log(err);
-
-alert("❌ فشل الاتصال بالسيرفر");
-
-}
+    }
 
 });
 
 </script>
 
 </body>
-
 </html>
