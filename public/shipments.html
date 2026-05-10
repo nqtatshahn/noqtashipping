@@ -21,8 +21,8 @@ body{
 
 h1{
     text-align:center;
-    margin-bottom:30px;
     color:#ffb300;
+    margin-bottom:30px;
 }
 
 form{
@@ -38,6 +38,7 @@ input,select{
     border:none;
     border-radius:10px;
     font-size:16px;
+    outline:none;
 }
 
 button{
@@ -85,77 +86,151 @@ button:hover{
 
 <div class="top-buttons">
 
-<a href="/list.html">قائمة الشحنات</a>
+<a href="/list.html">
+قائمة الشحنات
+</a>
 
-<a href="/tracking.html">تتبع الشحنات</a>
+<a href="/tracking.html">
+تتبع الشحنات
+</a>
 
-<a href="/packaging.html">التغليف</a>
+<a href="/packaging.html">
+التغليف
+</a>
 
-<a href="/delivery.html">التوصيل والاحتفاظ</a>
+<a href="/delivery.html">
+التوصيل والاحتفاظ
+</a>
 
 </div>
 
+
+
 <form id="shipmentForm">
 
-<input type="text" id="senderName" placeholder="اسم المرسل" required>
+<input
+type="text"
+id="senderName"
+placeholder="اسم المرسل"
+required
+>
 
-<input type="text" id="senderPhone" placeholder="رقم المرسل" required>
+<input
+type="text"
+id="senderPhone"
+placeholder="رقم المرسل"
+required
+>
 
-<input type="text" id="senderCity" placeholder="عنوان المرسل" required>
+<input
+type="text"
+id="senderCity"
+placeholder="عنوان المرسل"
+required
+>
 
-<input type="text" id="receiverName" placeholder="اسم المستلم" required>
+<input
+type="text"
+id="receiverName"
+placeholder="اسم المستلم"
+required
+>
 
-<input type="text" id="receiverPhone" placeholder="رقم المستلم" required>
+<input
+type="text"
+id="receiverPhone"
+placeholder="رقم المستلم"
+required
+>
 
-<input type="text" id="receiverCity" placeholder="عنوان المستلم" required>
+<input
+type="text"
+id="receiverCity"
+placeholder="عنوان المستلم"
+required
+>
 
-<input type="number" id="pieces" placeholder="عدد القطع" required>
+<input
+type="number"
+id="pieces"
+placeholder="عدد القطع"
+required
+>
 
-<input type="number" id="weight" placeholder="الوزن بالكيلو" required>
+<input
+type="number"
+id="weight"
+placeholder="الوزن بالكيلو"
+required
+>
 
-<input type="number" id="price" placeholder="السعر" readonly>
+<input
+type="number"
+id="price"
+placeholder="السعر"
+readonly
+>
 
 <select id="packaging">
 
-<option value="بدون">تغليف بدون</option>
+<option value="بدون">
+تغليف بدون
+</option>
 
-<option value="عادي">تغليف عادي</option>
+<option value="عادي">
+تغليف عادي
+</option>
 
-<option value="ممتاز">تغليف ممتاز</option>
+<option value="ممتاز">
+تغليف ممتاز
+</option>
 
 </select>
 
 <select id="deliveryType">
 
-<option value="توصيل">توصيل</option>
+<option value="توصيل">
+توصيل
+</option>
 
-<option value="احتفاظ">احتفاظ</option>
+<option value="احتفاظ">
+احتفاظ
+</option>
 
 </select>
 
 <button type="submit">
+
 إضافة الشحنة
+
 </button>
 
 </form>
 
+
+
 <script>
-
-const piecesInput = document.getElementById("pieces");
-const weightInput = document.getElementById("weight");
-const priceInput = document.getElementById("price");
-
-
 
 /* =========================
    حساب السعر تلقائي
 ========================= */
 
+const piecesInput =
+document.getElementById("pieces");
+
+const weightInput =
+document.getElementById("weight");
+
+const priceInput =
+document.getElementById("price");
+
 function calculatePrice(){
 
-    const pieces = Number(piecesInput.value) || 0;
+    const pieces =
+    Number(piecesInput.value) || 0;
 
-    const weight = Number(weightInput.value) || 0;
+    const weight =
+    Number(weightInput.value) || 0;
 
     let total = 0;
 
@@ -167,9 +242,15 @@ function calculatePrice(){
 
 }
 
-piecesInput.addEventListener("input", calculatePrice);
+piecesInput.addEventListener(
+"input",
+calculatePrice
+);
 
-weightInput.addEventListener("input", calculatePrice);
+weightInput.addEventListener(
+"input",
+calculatePrice
+);
 
 
 
@@ -177,72 +258,130 @@ weightInput.addEventListener("input", calculatePrice);
    إضافة الشحنة
 ========================= */
 
-document.getElementById("shipmentForm")
-.addEventListener("submit", async function(e){
+document
+.getElementById("shipmentForm")
+
+.addEventListener(
+"submit",
+
+async function(e){
 
     e.preventDefault();
 
     const shipmentData = {
 
         senderName:
-        document.getElementById("senderName").value,
+        document.getElementById(
+        "senderName").value,
+
+
 
         senderPhone:
-        document.getElementById("senderPhone").value,
+        document.getElementById(
+        "senderPhone").value,
+
+
 
         senderCity:
-        document.getElementById("senderCity").value,
+        document.getElementById(
+        "senderCity").value,
+
+
 
         receiverName:
-        document.getElementById("receiverName").value,
+        document.getElementById(
+        "receiverName").value,
+
+
 
         receiverPhone:
-        document.getElementById("receiverPhone").value,
+        document.getElementById(
+        "receiverPhone").value,
+
+
 
         receiverCity:
-        document.getElementById("receiverCity").value,
+        document.getElementById(
+        "receiverCity").value,
+
+
 
         pieces:
-        document.getElementById("pieces").value,
+        document.getElementById(
+        "pieces").value,
+
+
 
         weight:
-        document.getElementById("weight").value,
+        document.getElementById(
+        "weight").value,
+
+
 
         price:
-        document.getElementById("price").value,
+        document.getElementById(
+        "price").value,
+
+
 
         packaging:
-        document.getElementById("packaging").value,
+        document.getElementById(
+        "packaging").value,
+
+
 
         deliveryType:
-        document.getElementById("deliveryType").value
+        document.getElementById(
+        "deliveryType").value
 
     };
 
-    const response = await fetch("/add-shipment", {
 
-        method:"POST",
 
-        headers:{
-            "Content-Type":"application/json"
-        },
+    const response = await fetch(
 
-        body:JSON.stringify(shipmentData)
+        "/add-shipment",
 
-    });
+        {
 
-    const result = await response.json();
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify(
+                shipmentData
+            )
+
+        }
+
+    );
+
+
+
+    const result =
+    await response.json();
+
+
 
     if(result.success){
 
         alert(
+
             "تم إضافة الشحنة رقم: " +
+
             result.shipmentNumber
+
         );
 
-        window.location.href = "/list.html";
+        window.location.href =
+        "/list.html";
 
-    }else{
+    }
+
+    else{
 
         alert("حدث خطأ");
 

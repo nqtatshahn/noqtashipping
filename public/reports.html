@@ -1,46 +1,136 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>تقارير الموظفين | نقطة شحن</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+<title>التقارير | نقطة شحن</title>
 
 <style>
 
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:20px;
-background:#1c1c1c;
-color:white;
-border-radius:15px;
-overflow:hidden;
+body{
+    margin:0;
+    padding:20px;
+    background:#111;
+    color:white;
+    font-family:tahoma;
 }
 
-th, td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #333;
+h1{
+    text-align:center;
+    color:#ffb300;
+    margin-bottom:30px;
+}
+
+.top-buttons{
+    max-width:1200px;
+    margin:auto;
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.top-buttons a{
+    background:#222;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
+}
+
+.top-buttons a:hover{
+    background:#333;
+}
+
+.cards{
+
+    max-width:1200px;
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(250px,1fr));
+
+    gap:20px;
+
+}
+
+.card{
+
+    background:#1d1d1d;
+
+    border-radius:15px;
+
+    padding:25px;
+
+    text-align:center;
+
+    box-shadow:0 0 10px rgba(0,0,0,.3);
+
+}
+
+.card h2{
+
+    margin-bottom:15px;
+
+    color:#ffb300;
+
+}
+
+.number{
+
+    font-size:35px;
+
+    font-weight:bold;
+
+}
+
+.table-container{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    margin-top:40px;
+
+    overflow:auto;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#1d1d1d;
+
 }
 
 th{
-background:#FFD700;
-color:black;
+
+    background:#ffb300;
+
+    color:black;
+
+    padding:15px;
+
 }
 
-.best{
-background:#FFD700;
-color:black;
-padding:10px;
-border-radius:12px;
-margin-bottom:20px;
-font-weight:bold;
-display:inline-block;
+td{
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:1px solid #333;
+
 }
 
 </style>
@@ -49,15 +139,107 @@ display:inline-block;
 
 <body>
 
-<div class="main">
+<h1>
+📊 التقارير والإحصائيات
+</h1>
 
-<h1>📊 تقارير الموظفين</h1>
 
-<div class="best" id="bestEmployee">
 
-🏆 أفضل موظف:
+<div class="top-buttons">
+
+<a href="/shipments.html">
+إضافة شحنة
+</a>
+
+<a href="/list.html">
+قائمة الشحنات
+</a>
+
+<a href="/tracking.html">
+تتبع الشحنات
+</a>
 
 </div>
+
+
+
+<div class="cards">
+
+<div class="card">
+
+<h2>
+إجمالي الشحنات
+</h2>
+
+<div
+class="number"
+id="totalShipments">
+
+0
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+إجمالي الأرباح
+</h2>
+
+<div
+class="number"
+id="totalProfit">
+
+0
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+تم التسليم
+</h2>
+
+<div
+class="number"
+id="deliveredShipments">
+
+0
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>
+قيد التوصيل
+</h2>
+
+<div
+class="number"
+id="pendingShipments">
+
+0
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="table-container">
 
 <table>
 
@@ -65,139 +247,176 @@ display:inline-block;
 
 <tr>
 
-<th>الرقم الوظيفي</th>
+<th>
+رقم الشحنة
+</th>
 
-<th>عدد الشحنات</th>
+<th>
+المرسل
+</th>
 
-<th>إجمالي الأرباح</th>
+<th>
+المستلم
+</th>
 
-<th>تم التسليم</th>
+<th>
+السعر
+</th>
+
+<th>
+الحالة
+</th>
+
+<th>
+التاريخ
+</th>
 
 </tr>
 
 </thead>
 
-<tbody id="reportsTable">
-
-</tbody>
+<tbody id="reportTable"></tbody>
 
 </table>
 
 </div>
 
+
+
 <script>
 
 async function loadReports(){
 
-let shipmentsResponse =
-await fetch("/shipments");
+    const response =
+    await fetch("/shipments");
 
-let shipments =
-await shipmentsResponse.json();
+    const shipments =
+    await response.json();
 
-let employeesResponse =
-await fetch("/employees");
 
-let employees =
-await employeesResponse.json();
 
-let reports = {};
+    document.getElementById(
+    "totalShipments"
+    ).innerText =
 
-shipments.forEach(shipment => {
+    shipments.length;
 
-let emp = shipment.employee_number;
 
-if(!reports[emp]){
 
-reports[emp] = {
+    let totalProfit = 0;
 
-shipments:0,
-profits:0,
-delivered:0
+    let delivered = 0;
 
-};
+    let pending = 0;
+
+
+
+    const table =
+    document.getElementById(
+    "reportTable"
+    );
+
+
+
+    table.innerHTML = "";
+
+
+
+    shipments.forEach(shipment => {
+
+        totalProfit +=
+        Number(shipment.price);
+
+
+
+        if(
+        shipment.status ===
+        "تم التسليم"
+        ){
+
+            delivered++;
+
+        }
+
+
+
+        if(
+        shipment.status ===
+        "قيد التوصيل"
+        ){
+
+            pending++;
+
+        }
+
+
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>
+            ${shipment.shipmentNumber}
+            </td>
+
+            <td>
+            ${shipment.senderName}
+            </td>
+
+            <td>
+            ${shipment.receiverName}
+            </td>
+
+            <td>
+            ${shipment.price} ريال
+            </td>
+
+            <td>
+            ${shipment.status}
+            </td>
+
+            <td>
+            ${shipment.date}
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+
+
+    document.getElementById(
+    "totalProfit"
+    ).innerText =
+
+    totalProfit + " ريال";
+
+
+
+    document.getElementById(
+    "deliveredShipments"
+    ).innerText =
+
+    delivered;
+
+
+
+    document.getElementById(
+    "pendingShipments"
+    ).innerText =
+
+    pending;
 
 }
 
-reports[emp].shipments++;
 
-reports[emp].profits += shipment.price;
-
-if(shipment.status === "تم التسليم"){
-
-reports[emp].delivered++;
-
-}
-
-});
-
-let bestEmployee = "";
-let maxShipments = 0;
-
-let table =
-document.getElementById("reportsTable");
-
-table.innerHTML = "";
-
-for(let emp in reports){
-
-if(reports[emp].shipments > maxShipments){
-
-maxShipments = reports[emp].shipments;
-
-bestEmployee = emp;
-
-}
-
-table.innerHTML += `
-
-<tr>
-
-<td>${emp}</td>
-
-<td>${reports[emp].shipments}</td>
-
-<td>${reports[emp].profits} ريال</td>
-
-<td>${reports[emp].delivered}</td>
-
-</tr>
-
-`;
-
-}
-
-let employeeName = bestEmployee;
-
-if(bestEmployee !== "admin"){
-
-let employee =
-employees.find(e =>
-e.employee_number == bestEmployee
-);
-
-if(employee){
-
-employeeName = employee.name;
-
-}
-
-}else{
-
-employeeName = "فيصل";
-
-}
-
-document.getElementById("bestEmployee")
-.innerHTML =
-
-"🏆 أفضل موظف: " + employeeName;
-
-}
 
 loadReports();
 
 </script>
 
 </body>
+
 </html>

@@ -1,101 +1,144 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>التغليف | نقطة شحن</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
 
-.form-box{
-background:#1c1c1c;
-padding:30px;
-border-radius:20px;
-max-width:700px;
-margin:auto;
-box-shadow:0 0 15px rgba(255,215,0,0.1);
-margin-bottom:30px;
+body{
+    margin:0;
+    padding:20px;
+    background:#111;
+    color:white;
+    font-family:tahoma;
 }
 
-.form-box input{
-width:100%;
-padding:15px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#2c2c2c;
-color:white;
-font-size:16px;
+h1{
+    text-align:center;
+    color:#ffb300;
+    margin-bottom:30px;
 }
 
-.form-box button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-color:black;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+.top-buttons{
+    max-width:1200px;
+    margin:auto;
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-.price-box{
-background:#FFD700;
-color:black;
-padding:15px;
-border-radius:12px;
-font-size:20px;
-font-weight:bold;
-margin-bottom:15px;
-text-align:center;
+.top-buttons a{
+    background:#222;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
 }
 
-.result{
-background:#111;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-color:white;
+.top-buttons a:hover{
+    background:#333;
 }
 
-.print-btn{
-background:#FFD700;
-color:black;
-padding:12px;
-border:none;
-border-radius:10px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-margin-top:15px;
-width:100%;
+form{
+
+    max-width:900px;
+
+    margin:auto;
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:15px;
+
+}
+
+input,
+select{
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+}
+
+button{
+
+    background:#ff9800;
+
+    color:white;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+}
+
+button:hover{
+
+    background:#e68900;
+
+}
+
+.table-container{
+
+    max-width:1200px;
+
+    margin:auto;
+
+    margin-top:40px;
+
+    overflow:auto;
+
 }
 
 table{
-width:100%;
-border-collapse:collapse;
-background:#1c1c1c;
-color:white;
-border-radius:15px;
-overflow:hidden;
-margin-top:30px;
-}
 
-th, td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #333;
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#1d1d1d;
+
 }
 
 th{
-background:#FFD700;
-color:black;
+
+    background:#ffb300;
+
+    color:black;
+
+    padding:15px;
+
+}
+
+td{
+
+    padding:12px;
+
+    text-align:center;
+
+    border-bottom:1px solid #333;
+
 }
 
 </style>
@@ -104,38 +147,73 @@ color:black;
 
 <body>
 
-<div class="main">
+<h1>
+📦 التغليف
+</h1>
 
-<h1>📦 التغليف</h1>
 
-<div class="form-box">
 
-<input type="text" id="customerName" placeholder="اسم العميل">
+<div class="top-buttons">
 
-<input type="text" id="phone" placeholder="رقم الجوال">
+<a href="/shipments.html">
+إضافة شحنة
+</a>
+
+<a href="/list.html">
+قائمة الشحنات
+</a>
+
+<a href="/reports.html">
+التقارير
+</a>
+
+</div>
+
+
+
+<form id="packagingForm">
+
+<input
+type="text"
+id="shipmentNumber"
+placeholder="رقم الشحنة"
+required
+>
+
+<select id="packagingType">
+
+<option value="عادي">
+تغليف عادي
+</option>
+
+<option value="ممتاز">
+تغليف ممتاز
+</option>
+
+<option value="خشبي">
+تغليف خشبي
+</option>
+
+</select>
 
 <input
 type="number"
-id="pieces"
-placeholder="عدد القطع"
-oninput="calculatePrice()"
+id="price"
+placeholder="السعر"
+readonly
 >
 
-<div class="price-box" id="priceBox">
+<button type="submit">
 
-المبلغ: 0 ريال
-
-</div>
-
-<button onclick="addPackaging()">
 حفظ التغليف
+
 </button>
 
-<div class="result" id="result">
+</form>
 
-</div>
 
-</div>
+
+<div class="table-container">
 
 <table>
 
@@ -143,162 +221,241 @@ oninput="calculatePrice()"
 
 <tr>
 
-<th>رقم الفاتورة</th>
+<th>
+رقم الشحنة
+</th>
 
-<th>العميل</th>
+<th>
+نوع التغليف
+</th>
 
-<th>الجوال</th>
-
-<th>عدد القطع</th>
-
-<th>المبلغ</th>
-
-<th>الموظف</th>
+<th>
+السعر
+</th>
 
 </tr>
 
 </thead>
 
-<tbody id="packagingTable">
-
-</tbody>
+<tbody id="packagingTable"></tbody>
 
 </table>
 
 </div>
 
+
+
 <script>
 
-let packagingList = [];
+const packagingType =
+document.getElementById(
+"packagingType"
+);
+
+const priceInput =
+document.getElementById(
+"price"
+);
+
+
+
+/* =========================
+   حساب السعر تلقائي
+========================= */
 
 function calculatePrice(){
 
-let pieces =
-Number(document.getElementById("pieces").value);
+    if(
+    packagingType.value ===
+    "عادي"
+    ){
 
-let total = pieces * 8;
+        priceInput.value = 15;
 
-document.getElementById("priceBox").innerText =
+    }
 
-"المبلغ: " + total + " ريال";
+    else if(
+    packagingType.value ===
+    "ممتاز"
+    ){
+
+        priceInput.value = 30;
+
+    }
+
+    else if(
+    packagingType.value ===
+    "خشبي"
+    ){
+
+        priceInput.value = 60;
+
+    }
 
 }
 
-async function addPackaging(){
+packagingType.addEventListener(
+"change",
+calculatePrice
+);
 
-let pieces =
-Number(document.getElementById("pieces").value);
+calculatePrice();
 
-let total = pieces * 8;
 
-let invoiceNumber =
-"PKG" + Math.floor(10000 + Math.random() * 90000);
 
-let date = new Date();
+/* =========================
+   حفظ التغليف
+========================= */
 
-let packaging = {
+document
+.getElementById("packagingForm")
 
-invoice_number: invoiceNumber,
+.addEventListener(
+"submit",
 
-service_type: "تغليف",
+async function(e){
 
-customer_name:
-document.getElementById("customerName").value,
+    e.preventDefault();
 
-phone:
-document.getElementById("phone").value,
+    const shipmentNumber =
+    document.getElementById(
+    "shipmentNumber"
+    ).value;
 
-details:
-pieces + " قطع",
 
-price:
-total,
 
-employee_number:
-localStorage.getItem("employee"),
+    const response =
+    await fetch("/shipments");
 
-date:
-date.toLocaleDateString(),
+    const shipments =
+    await response.json();
 
-time:
-date.toLocaleTimeString()
 
-};
 
-await fetch("/add-service", {
+    const shipment =
+    shipments.find(
 
-method:"POST",
+        s =>
 
-headers:{
-"Content-Type":"application/json"
-},
+        s.shipmentNumber ===
+        shipmentNumber
 
-body: JSON.stringify(packaging)
+    );
+
+
+
+    if(!shipment){
+
+        alert("الشحنة غير موجودة");
+
+        return;
+
+    }
+
+
+
+    shipment.packaging =
+    packagingType.value;
+
+
+
+    shipment.packagingPrice =
+    priceInput.value;
+
+
+
+    await fetch(
+
+        "/update-status",
+
+        {
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+                shipmentNumber,
+
+                status:
+                shipment.status
+
+            })
+
+        }
+
+    );
+
+
+
+    alert("تم حفظ التغليف");
+
+    loadPackaging();
 
 });
 
-packagingList.push(packaging);
+
+
+/* =========================
+   عرض التغليف
+========================= */
+
+async function loadPackaging(){
+
+    const response =
+    await fetch("/shipments");
+
+    const shipments =
+    await response.json();
+
+
+
+    const table =
+    document.getElementById(
+    "packagingTable"
+    );
+
+
+
+    table.innerHTML = "";
+
+
+
+    shipments.forEach(shipment => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>
+            ${shipment.shipmentNumber}
+            </td>
+
+            <td>
+            ${shipment.packaging || "-"}
+            </td>
+
+            <td>
+            ${shipment.packagingPrice || 0}
+            ريال
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
 
 loadPackaging();
-
-document.getElementById("result").innerHTML = `
-
-<h2>✅ تم حفظ الفاتورة</h2>
-
-<p><b>رقم الفاتورة:</b>
-${invoiceNumber}</p>
-
-<p><b>عدد القطع:</b>
-${pieces}</p>
-
-<p><b>المبلغ:</b>
-${total} ريال</p>
-
-<button class="print-btn"
-onclick="window.print()">
-
-🖨️ طباعة الفاتورة
-
-</button>
-
-`;
-
-}
-
-function loadPackaging(){
-
-let table =
-document.getElementById("packagingTable");
-
-table.innerHTML = "";
-
-packagingList.forEach(item => {
-
-table.innerHTML += `
-
-<tr>
-
-<td>${item.invoice_number}</td>
-
-<td>${item.customer_name}</td>
-
-<td>${item.phone}</td>
-
-<td>${item.details}</td>
-
-<td>${item.price} ريال</td>
-
-<td>${item.employee_number}</td>
-
-</tr>
-
-`;
-
-});
-
-}
 
 </script>
 
 </body>
+
 </html>

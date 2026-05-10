@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>إدارة الموظفين | نقطة شحن</title>
 
@@ -12,57 +14,74 @@
 
 <style>
 
-.form-box{
-background:#1c1c1c;
-padding:30px;
-border-radius:20px;
-max-width:700px;
-margin:auto;
-box-shadow:0 0 15px rgba(255,215,0,0.1);
-margin-bottom:30px;
+.employee-card{
+
+    background:#1d1d1d;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-top:20px;
+
 }
 
-.form-box input{
-width:100%;
-padding:15px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#2c2c2c;
-color:white;
-font-size:16px;
+.permissions{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-top:10px;
+
 }
 
-.form-box button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-color:black;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+.permission-item{
+
+    background:#2a2a2a;
+
+    padding:10px 15px;
+
+    border-radius:10px;
+
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:#1c1c1c;
-color:white;
-border-radius:15px;
-overflow:hidden;
+.delete-btn{
+
+    background:#f44336;
+
 }
 
-th, td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #333;
+.role-badge{
+
+    display:inline-block;
+
+    padding:8px 15px;
+
+    border-radius:10px;
+
+    font-size:14px;
+
+    font-weight:bold;
+
 }
 
-th{
-background:#FFD700;
-color:black;
+.role-admin{
+
+    background:#ff9800;
+
+    color:white;
+
+}
+
+.role-employee{
+
+    background:#2196f3;
+
+    color:white;
+
 }
 
 </style>
@@ -71,27 +90,82 @@ color:black;
 
 <body>
 
-<div class="main">
+<div class="container">
 
-<h1>👨‍💼 إدارة الموظفين</h1>
+<h1>
+👨‍💼 إدارة الموظفين
+</h1>
 
-<div class="form-box">
 
-<input type="text" id="name" placeholder="اسم الموظف">
 
-<input type="text" id="phone" placeholder="رقم الجوال">
+<div class="top-buttons">
 
-<input type="text" id="email" placeholder="البريد الإلكتروني">
+<a href="/shipments.html">
+إضافة شحنة
+</a>
 
-<input type="text" id="nationalId" placeholder="رقم الهوية / الإقامة">
+<a href="/list.html">
+قائمة الشحنات
+</a>
 
-<input type="password" id="password" placeholder="كلمة المرور">
+<a href="/reports.html">
+التقارير
+</a>
 
-<button onclick="addEmployee()">
-إضافة موظف
-</button>
+<a href="/tracking.html">
+التتبع
+</a>
 
 </div>
+
+
+
+<form id="employeeForm">
+
+<input
+type="text"
+id="employeeName"
+placeholder="اسم الموظف"
+required
+>
+
+<input
+type="text"
+id="employeeUsername"
+placeholder="اسم المستخدم"
+required
+>
+
+<input
+type="password"
+id="employeePassword"
+placeholder="كلمة المرور"
+required
+>
+
+<select id="employeeRole">
+
+<option value="employee">
+موظف
+</option>
+
+<option value="admin">
+مدير
+</option>
+
+</select>
+
+<button type="submit">
+
+إضافة موظف
+
+</button>
+
+</form>
+
+
+
+<div class="table-container">
 
 <table>
 
@@ -99,107 +173,291 @@ color:black;
 
 <tr>
 
-<th>الرقم الوظيفي</th>
+<th>
+الاسم
+</th>
 
-<th>الاسم</th>
+<th>
+اسم المستخدم
+</th>
 
-<th>الجوال</th>
+<th>
+الصلاحية
+</th>
 
-<th>البريد</th>
+<th>
+الصلاحيات
+</th>
 
-<th>الهوية</th>
+<th>
+الحذف
+</th>
 
 </tr>
 
 </thead>
 
-<tbody id="employeesTable">
-
-</tbody>
+<tbody id="employeesTable"></tbody>
 
 </table>
 
 </div>
 
+</div>
+
+
+
 <script>
 
-async function addEmployee(){
+/* =========================
+   تخزين الموظفين
+========================= */
 
-let employee = {
+let employees = JSON.parse(
 
-employee_number:
-Math.floor(10000 + Math.random() * 90000),
+localStorage.getItem("employees")
 
-name:
-document.getElementById("name").value,
+) || [
 
-phone:
-document.getElementById("phone").value,
-
-email:
-document.getElementById("email").value,
-
-national_id:
-document.getElementById("nationalId").value,
-
-password:
-document.getElementById("password").value
-
-};
-
-await fetch("/add-employee", {
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
+{
+    name:"المدير",
+    username:"admin",
+    password:"1234",
+    role:"admin"
 },
 
-body: JSON.stringify(employee)
+{
+    name:"الموظف",
+    username:"employee",
+    password:"1234",
+    role:"employee"
+}
 
-});
+];
 
-loadEmployees();
+
+
+/* =========================
+   حفظ البيانات
+========================= */
+
+function saveEmployees(){
+
+    localStorage.setItem(
+
+        "employees",
+
+        JSON.stringify(employees)
+
+    );
 
 }
 
-async function loadEmployees(){
 
-let response = await fetch("/employees");
 
-let employees = await response.json();
+/* =========================
+   عرض الموظفين
+========================= */
 
-let table = document.getElementById("employeesTable");
+function renderEmployees(){
 
-table.innerHTML = "";
+    const table =
+    document.getElementById(
+    "employeesTable"
+    );
 
-employees.forEach(emp => {
 
-table.innerHTML += `
 
-<tr>
+    table.innerHTML = "";
 
-<td>${emp.employee_number}</td>
 
-<td>${emp.name}</td>
 
-<td>${emp.phone}</td>
+    employees.forEach((employee,index)=>{
 
-<td>${emp.email}</td>
+        table.innerHTML += `
 
-<td>${emp.national_id}</td>
+        <tr>
 
-</tr>
+            <td>
+            ${employee.name}
+            </td>
 
-`;
+            <td>
+            ${employee.username}
+            </td>
 
-});
+            <td>
+
+                <span class="
+                role-badge
+
+                ${employee.role === "admin"
+                ? "role-admin"
+                : "role-employee"}">
+
+                ${employee.role === "admin"
+                ? "مدير"
+                : "موظف"}
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <div class="permissions">
+
+                ${
+                employee.role === "admin"
+
+                ?
+
+                `
+                <div class="permission-item">
+                جميع الصلاحيات
+                </div>
+                `
+
+                :
+
+                `
+                <div class="permission-item">
+                إضافة شحنة
+                </div>
+
+                <div class="permission-item">
+                التتبع
+                </div>
+
+                <div class="permission-item">
+                التغليف
+                </div>
+
+                <div class="permission-item">
+                التوصيل
+                </div>
+                `
+                }
+
+                </div>
+
+            </td>
+
+            <td>
+
+                <button
+
+                class="delete-btn"
+
+                onclick="
+                deleteEmployee(${index})
+                ">
+
+                حذف
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
 
 }
 
-loadEmployees();
+
+
+/* =========================
+   إضافة موظف
+========================= */
+
+document
+.getElementById("employeeForm")
+
+.addEventListener(
+"submit",
+
+function(e){
+
+    e.preventDefault();
+
+
+
+    const employee = {
+
+        name:
+        document.getElementById(
+        "employeeName").value,
+
+
+
+        username:
+        document.getElementById(
+        "employeeUsername").value,
+
+
+
+        password:
+        document.getElementById(
+        "employeePassword").value,
+
+
+
+        role:
+        document.getElementById(
+        "employeeRole").value
+
+    };
+
+
+
+    employees.push(employee);
+
+    saveEmployees();
+
+    renderEmployees();
+
+    alert("تم إضافة الموظف");
+
+
+
+    document.getElementById(
+    "employeeForm"
+    ).reset();
+
+});
+
+
+
+/* =========================
+   حذف موظف
+========================= */
+
+function deleteEmployee(index){
+
+    const confirmDelete =
+    confirm("حذف الموظف؟");
+
+    if(!confirmDelete) return;
+
+
+
+    employees.splice(index,1);
+
+    saveEmployees();
+
+    renderEmployees();
+
+}
+
+
+
+renderEmployees();
 
 </script>
 
 </body>
+
 </html>

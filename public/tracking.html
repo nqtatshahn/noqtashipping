@@ -1,69 +1,166 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>تتبع الشحنة | نقطة شحن</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
+<title>تتبع الشحنات | نقطة شحن</title>
 
 <style>
 
-.track-box{
-max-width:700px;
-margin:auto;
-background:#1c1c1c;
-padding:30px;
-border-radius:20px;
-box-shadow:0 0 15px rgba(255,215,0,0.1);
+body{
+    margin:0;
+    padding:20px;
+    background:#111;
+    color:white;
+    font-family:tahoma;
 }
 
-.track-box input{
-width:100%;
-padding:15px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#2c2c2c;
-color:white;
-font-size:16px;
+h1{
+    text-align:center;
+    color:#ffb300;
+    margin-bottom:30px;
 }
 
-.track-box button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-color:black;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+.top-buttons{
+    max-width:1200px;
+    margin:auto;
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-.result{
-margin-top:20px;
-background:#111;
-padding:20px;
-border-radius:15px;
+.top-buttons a{
+    background:#222;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
 }
 
-.info{
-margin-bottom:10px;
-font-size:16px;
+.top-buttons a:hover{
+    background:#333;
+}
+
+.search-box{
+
+    max-width:700px;
+
+    margin:auto;
+
+    display:flex;
+
+    gap:10px;
+
+    margin-bottom:30px;
+
+}
+
+.search-box input{
+
+    flex:1;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+}
+
+.search-box button{
+
+    background:#ff9800;
+
+    color:white;
+
+    border:none;
+
+    padding:15px 25px;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+}
+
+.search-box button:hover{
+
+    background:#e68900;
+
+}
+
+.card{
+
+    max-width:700px;
+
+    margin:auto;
+
+    background:#1d1d1d;
+
+    border-radius:20px;
+
+    padding:25px;
+
+    display:none;
+
+}
+
+.section{
+
+    margin-bottom:20px;
+
+    padding-bottom:15px;
+
+    border-bottom:1px solid #333;
+
+}
+
+.title{
+
+    color:#ffb300;
+
+    margin-bottom:10px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+}
+
+.value{
+
+    line-height:2;
+
 }
 
 .status{
-background:#FFD700;
-color:black;
-padding:10px;
-border-radius:10px;
-display:inline-block;
-font-weight:bold;
-margin-top:10px;
+
+    background:#4caf50;
+
+    color:white;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    text-align:center;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    margin-top:15px;
+
 }
 
 </style>
@@ -72,134 +169,275 @@ margin-top:10px;
 
 <body>
 
-<div class="main">
+<h1>
+🚚 تتبع الشحنات
+</h1>
 
-<h1>📍 تتبع الشحنة</h1>
 
-<div class="track-box">
+
+<div class="top-buttons">
+
+<a href="/shipments.html">
+إضافة شحنة
+</a>
+
+<a href="/list.html">
+قائمة الشحنات
+</a>
+
+<a href="/reports.html">
+التقارير
+</a>
+
+</div>
+
+
+
+<div class="search-box">
 
 <input
 type="text"
-id="search"
-placeholder="رقم الشحنة أو رقم الجوال"
+id="trackingNumber"
+placeholder="أدخل رقم الشحنة"
 >
 
 <button onclick="trackShipment()">
-بحث
+
+تتبع
+
 </button>
 
-<div class="result" id="result">
+</div>
+
+
+
+<div class="card" id="trackingCard">
+
+<div class="section">
+
+<div class="title">
+رقم الشحنة
+</div>
+
+<div
+class="value"
+id="shipmentNumber">
 
 </div>
 
 </div>
 
+
+
+<div class="section">
+
+<div class="title">
+بيانات المرسل
 </div>
+
+<div
+class="value"
+id="senderData">
+
+</div>
+
+</div>
+
+
+
+<div class="section">
+
+<div class="title">
+بيانات المستلم
+</div>
+
+<div
+class="value"
+id="receiverData">
+
+</div>
+
+</div>
+
+
+
+<div class="section">
+
+<div class="title">
+تفاصيل الشحنة
+</div>
+
+<div
+class="value"
+id="shipmentDetails">
+
+</div>
+
+</div>
+
+
+
+<div
+class="status"
+id="shipmentStatus">
+
+</div>
+
+</div>
+
+
 
 <script>
 
+/* =========================
+   تتبع الشحنة
+========================= */
+
 async function trackShipment(){
 
-let search =
-document.getElementById("search").value;
+    const number =
+    document.getElementById(
+    "trackingNumber"
+    ).value;
 
-let response = await fetch("/shipments");
 
-let shipments = await response.json();
 
-let shipment = shipments.find(item =>
+    const response =
+    await fetch("/shipments");
 
-item.shipment_number === search
+    const shipments =
+    await response.json();
 
-||
 
-item.sender_phone === search
 
-||
+    const shipment =
+    shipments.find(
 
-item.receiver_phone === search
+        s =>
 
-);
+        s.shipmentNumber === number
 
-if(shipment){
+    );
 
-document.getElementById("result").innerHTML = `
 
-<div class="info">
-📦 رقم الشحنة:
-${shipment.shipment_number}
-</div>
 
-<div class="info">
-📤 المرسل:
-${shipment.sender_name}
-</div>
+    if(!shipment){
 
-<div class="info">
-📞 جوال المرسل:
-${shipment.sender_phone}
-</div>
+        alert("الشحنة غير موجودة");
 
-<div class="info">
-📍 عنوان المرسل:
-${shipment.sender_address}
-</div>
+        return;
 
-<hr>
+    }
 
-<div class="info">
-📥 المستلم:
-${shipment.receiver_name}
-</div>
 
-<div class="info">
-📞 جوال المستلم:
-${shipment.receiver_phone}
-</div>
 
-<div class="info">
-📍 عنوان المستلم:
-${shipment.receiver_address}
-</div>
+    document.getElementById(
+    "trackingCard"
+    ).style.display = "block";
 
-<hr>
 
-<div class="info">
-📅 التاريخ:
-${shipment.date}
-</div>
 
-<div class="info">
-⏰ الوقت:
-${shipment.time}
-</div>
+    document.getElementById(
+    "shipmentNumber"
+    ).innerText =
 
-<div class="info">
-💰 المبلغ:
-${shipment.price} ريال
-</div>
+    shipment.shipmentNumber;
 
-<div class="status">
-🚚 ${shipment.status}
-</div>
 
-`;
 
-}else{
+    document.getElementById(
+    "senderData"
+    ).innerHTML =
 
-document.getElementById("result").innerHTML = `
+    `
+    الاسم:
+    ${shipment.senderName}
 
-<div class="status">
-❌ الشحنة غير موجودة
-</div>
+    <br><br>
 
-`;
+    الجوال:
+    ${shipment.senderPhone}
 
-}
+    <br><br>
+
+    العنوان:
+    ${shipment.senderCity}
+    `;
+
+
+
+    document.getElementById(
+    "receiverData"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.receiverName}
+
+    <br><br>
+
+    الجوال:
+    ${shipment.receiverPhone}
+
+    <br><br>
+
+    العنوان:
+    ${shipment.receiverCity}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentDetails"
+    ).innerHTML =
+
+    `
+    عدد القطع:
+    ${shipment.pieces}
+
+    <br><br>
+
+    الوزن:
+    ${shipment.weight} كجم
+
+    <br><br>
+
+    السعر:
+    ${shipment.price} ريال
+
+    <br><br>
+
+    التغليف:
+    ${shipment.packaging}
+
+    <br><br>
+
+    نوع الخدمة:
+    ${shipment.deliveryType}
+
+    <br><br>
+
+    التاريخ:
+    ${shipment.date}
+
+    <br><br>
+
+    الوقت:
+    ${shipment.time}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentStatus"
+    ).innerText =
+
+    shipment.status;
 
 }
 
 </script>
 
 </body>
+
 </html>

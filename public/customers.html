@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>العملاء | نقطة شحن</title>
 
@@ -12,57 +14,91 @@
 
 <style>
 
-.form-box{
-background:#1c1c1c;
-padding:30px;
-border-radius:20px;
-max-width:700px;
-margin:auto;
-box-shadow:0 0 15px rgba(255,215,0,0.1);
-margin-bottom:30px;
+.customer-card{
+
+    background:#1d1d1d;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-top:20px;
+
 }
 
-.form-box input{
-width:100%;
-padding:15px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#2c2c2c;
-color:white;
-font-size:16px;
+.customer-badge{
+
+    display:inline-block;
+
+    background:#4caf50;
+
+    color:white;
+
+    padding:8px 15px;
+
+    border-radius:10px;
+
+    font-size:14px;
+
 }
 
-.form-box button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-color:black;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+.notes-box{
+
+    background:#2a2a2a;
+
+    padding:10px;
+
+    border-radius:10px;
+
+    min-width:200px;
+
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:#1c1c1c;
-color:white;
-border-radius:15px;
-overflow:hidden;
+.delete-btn{
+
+    background:#f44336;
+
 }
 
-th, td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #333;
+.stats-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+    margin-bottom:30px;
+
 }
 
-th{
-background:#FFD700;
-color:black;
+.stats-card{
+
+    background:#1d1d1d;
+
+    border-radius:15px;
+
+    padding:20px;
+
+    text-align:center;
+
+}
+
+.stats-card h2{
+
+    color:#ffb300;
+
+    margin-bottom:15px;
+
+}
+
+.stats-number{
+
+    font-size:35px;
+
+    font-weight:bold;
+
 }
 
 </style>
@@ -71,29 +107,115 @@ color:black;
 
 <body>
 
-<div class="main">
+<div class="container">
 
-<h1>👥 العملاء</h1>
+<h1>
+👥 العملاء
+</h1>
 
-<div class="form-box">
 
-<input type="text" id="name" placeholder="اسم العميل">
 
-<input type="text" id="phone" placeholder="رقم الجوال">
+<div class="top-buttons">
 
-<input type="text" id="phone2" placeholder="رقم جوال إضافي">
+<a href="/dashboard.html">
+لوحة التحكم
+</a>
 
-<input type="text" id="email" placeholder="البريد الإلكتروني">
+<a href="/shipments.html">
+إضافة شحنة
+</a>
 
-<input type="text" id="store" placeholder="اسم المتجر">
+<a href="/list.html">
+قائمة الشحنات
+</a>
 
-<input type="text" id="products" placeholder="أنواع المنتجات">
-
-<button onclick="addCustomer()">
-إضافة عميل
-</button>
+<a href="/reports.html">
+التقارير
+</a>
 
 </div>
+
+
+
+<div class="stats-grid">
+
+<div class="stats-card">
+
+<h2>
+إجمالي العملاء
+</h2>
+
+<div
+class="stats-number"
+id="totalCustomers">
+
+0
+
+</div>
+
+</div>
+
+
+
+<div class="stats-card">
+
+<h2>
+العملاء النشطين
+</h2>
+
+<div
+class="stats-number"
+id="activeCustomers">
+
+0
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<form id="customerForm">
+
+<input
+type="text"
+id="customerName"
+placeholder="اسم العميل"
+required
+>
+
+<input
+type="text"
+id="customerPhone"
+placeholder="رقم الجوال"
+required
+>
+
+<input
+type="text"
+id="customerAddress"
+placeholder="العنوان"
+required
+>
+
+<textarea
+id="customerNotes"
+placeholder="ملاحظات"
+></textarea>
+
+<button type="submit">
+
+إضافة عميل
+
+</button>
+
+</form>
+
+
+
+<div class="table-container">
 
 <table>
 
@@ -101,110 +223,264 @@ color:black;
 
 <tr>
 
-<th>رقم العميل</th>
+<th>
+الاسم
+</th>
 
-<th>الاسم</th>
+<th>
+الجوال
+</th>
 
-<th>الجوال</th>
+<th>
+العنوان
+</th>
 
-<th>المتجر</th>
+<th>
+الملاحظات
+</th>
 
-<th>المنتجات</th>
+<th>
+الحالة
+</th>
+
+<th>
+الحذف
+</th>
 
 </tr>
 
 </thead>
 
-<tbody id="customersTable">
-
-</tbody>
+<tbody id="customersTable"></tbody>
 
 </table>
 
 </div>
 
+</div>
+
+
+
 <script>
 
-async function addCustomer(){
+/* =========================
+   تخزين العملاء
+========================= */
 
-let customer = {
+let customers = JSON.parse(
 
-customer_number:
-"MD" + Math.floor(1000 + Math.random() * 9000),
+localStorage.getItem("customers")
 
-name:
-document.getElementById("name").value,
+) || [];
 
-phone:
-document.getElementById("phone").value,
 
-phone2:
-document.getElementById("phone2").value,
 
-email:
-document.getElementById("email").value,
+/* =========================
+   حفظ البيانات
+========================= */
 
-store_name:
-document.getElementById("store").value,
+function saveCustomers(){
 
-products:
-document.getElementById("products").value
+    localStorage.setItem(
 
-};
+        "customers",
 
-await fetch("/add-customer", {
+        JSON.stringify(customers)
 
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body: JSON.stringify(customer)
-
-});
-
-loadCustomers();
+    );
 
 }
 
-async function loadCustomers(){
 
-let response = await fetch("/customers");
 
-let customers = await response.json();
+/* =========================
+   عرض العملاء
+========================= */
 
-let table = document.getElementById("customersTable");
+function renderCustomers(){
 
-table.innerHTML = "";
+    const table =
+    document.getElementById(
+    "customersTable"
+    );
 
-customers.forEach(customer => {
 
-table.innerHTML += `
 
-<tr>
+    table.innerHTML = "";
 
-<td>${customer.customer_number}</td>
 
-<td>${customer.name}</td>
 
-<td>${customer.phone}</td>
+    customers.forEach((customer,index)=>{
 
-<td>${customer.store_name}</td>
+        table.innerHTML += `
 
-<td>${customer.products}</td>
+        <tr>
 
-</tr>
+            <td>
+            ${customer.name}
+            </td>
 
-`;
+            <td>
+            ${customer.phone}
+            </td>
 
-});
+            <td>
+            ${customer.address}
+            </td>
+
+            <td>
+
+                <div class="notes-box">
+
+                ${customer.notes || "-"}
+
+                </div>
+
+            </td>
+
+            <td>
+
+                <span class="customer-badge">
+
+                نشط
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <button
+
+                class="delete-btn"
+
+                onclick="
+                deleteCustomer(${index})
+                ">
+
+                حذف
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+
+
+    document.getElementById(
+    "totalCustomers"
+    ).innerText =
+
+    customers.length;
+
+
+
+    document.getElementById(
+    "activeCustomers"
+    ).innerText =
+
+    customers.length;
 
 }
 
-loadCustomers();
+
+
+/* =========================
+   إضافة عميل
+========================= */
+
+document
+.getElementById("customerForm")
+
+.addEventListener(
+"submit",
+
+function(e){
+
+    e.preventDefault();
+
+
+
+    const customer = {
+
+        name:
+        document.getElementById(
+        "customerName").value,
+
+
+
+        phone:
+        document.getElementById(
+        "customerPhone").value,
+
+
+
+        address:
+        document.getElementById(
+        "customerAddress").value,
+
+
+
+        notes:
+        document.getElementById(
+        "customerNotes").value
+
+    };
+
+
+
+    customers.push(customer);
+
+    saveCustomers();
+
+    renderCustomers();
+
+
+
+    alert("تم إضافة العميل");
+
+
+
+    document.getElementById(
+    "customerForm"
+    ).reset();
+
+});
+
+
+
+/* =========================
+   حذف عميل
+========================= */
+
+function deleteCustomer(index){
+
+    const confirmDelete =
+    confirm("حذف العميل؟");
+
+    if(!confirmDelete) return;
+
+
+
+    customers.splice(index,1);
+
+    saveCustomers();
+
+    renderCustomers();
+
+}
+
+
+
+renderCustomers();
 
 </script>
 
 </body>
+
 </html>

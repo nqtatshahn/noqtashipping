@@ -8,53 +8,132 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>بوليصة الشحنة</title>
+<title>بوليصة الشحنة | نقطة شحن</title>
 
 <style>
 
 body{
-font-family:Tahoma;
-background:#f5f5f5;
-padding:20px;
+    margin:0;
+    padding:20px;
+    background:#f5f5f5;
+    font-family:tahoma;
 }
 
 .card{
-max-width:400px;
-margin:auto;
-background:white;
-padding:20px;
-border-radius:20px;
-box-shadow:0 0 10px rgba(0,0,0,.1);
+
+    max-width:450px;
+    margin:auto;
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    box-shadow:0 0 15px rgba(0,0,0,.1);
+
 }
 
-h1{
-text-align:center;
-color:#f6b32d;
+.logo{
+
+    text-align:center;
+    font-size:32px;
+    font-weight:bold;
+    color:#ff9800;
+    margin-bottom:20px;
+
+}
+
+.shipment-number{
+
+    background:#ff9800;
+    color:white;
+    padding:15px;
+    border-radius:15px;
+    text-align:center;
+    font-size:24px;
+    font-weight:bold;
+
+}
+
+.section{
+
+    margin-top:20px;
+
 }
 
 .box{
-background:#fafafa;
-padding:15px;
-border-radius:10px;
-margin-top:15px;
+
+    background:#fafafa;
+    border-radius:15px;
+    padding:15px;
+    margin-bottom:15px;
+
 }
 
-button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#f6b32d;
-color:white;
-font-size:18px;
-margin-top:20px;
-cursor:pointer;
+.title{
+
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:10px;
+    color:#666;
+
+}
+
+.value{
+
+    font-size:18px;
+    line-height:1.8;
+
+}
+
+.status{
+
+    background:#4caf50;
+    color:white;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+    margin-top:10px;
+    font-weight:bold;
+
+}
+
+.print-btn{
+
+    width:100%;
+    margin-top:20px;
+    padding:15px;
+    border:none;
+    border-radius:15px;
+    background:#ff9800;
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+
+}
+
+.print-btn:hover{
+
+    background:#e68900;
+
+}
+
+.footer{
+
+    text-align:center;
+    margin-top:25px;
+    color:#777;
+    font-size:15px;
+
 }
 
 @media print{
-button{
-display:none;
-}
+
+    body{
+        background:white;
+    }
+
+    .print-btn{
+        display:none;
+    }
+
 }
 
 </style>
@@ -65,84 +144,249 @@ display:none;
 
 <div class="card">
 
-<h1>
-🚚 نقطة شحن
-</h1>
+<div class="logo">
 
-<div class="box" id="shipmentData">
+🚚 نقطة شحن
 
 </div>
 
-<button onclick="window.print()">
 
-🖨️ طباعة
+
+<div
+class="shipment-number"
+id="shipmentNumber">
+
+رقم الشحنة
+
+</div>
+
+
+
+<div class="section">
+
+<div class="box">
+
+<div class="title">
+
+بيانات المرسل
+
+</div>
+
+<div
+class="value"
+id="senderData">
+
+</div>
+
+</div>
+
+
+
+<div class="box">
+
+<div class="title">
+
+بيانات المستلم
+
+</div>
+
+<div
+class="value"
+id="receiverData">
+
+</div>
+
+</div>
+
+
+
+<div class="box">
+
+<div class="title">
+
+تفاصيل الشحنة
+
+</div>
+
+<div
+class="value"
+id="shipmentDetails">
+
+</div>
+
+</div>
+
+
+
+<div
+class="status"
+id="shipmentStatus">
+
+</div>
+
+</div>
+
+
+
+<button
+class="print-btn"
+onclick="window.print()">
+
+🖨️ طباعة البوليصة
 
 </button>
 
+
+
+<div class="footer">
+
+شكراً لاختياركم نقطة شحن ❤️
+
 </div>
+
+</div>
+
+
 
 <script>
 
-const shipment = JSON.parse(
+async function loadShipment(){
 
-localStorage.getItem("shipment")
+    const params =
+    new URLSearchParams(
+    window.location.search
+    );
 
-);
+    const number =
+    params.get("number");
 
-if(shipment){
 
-document.getElementById(
 
-"shipmentData"
+    const response =
+    await fetch("/shipments");
 
-).innerHTML =
+    const shipments =
+    await response.json();
 
-`
 
-رقم الشحنة:
-<b>${shipment.id}</b>
 
-<hr>
+    const shipment =
+    shipments.find(
 
-المرسل:
-${shipment.sender_name}
+        s =>
 
-<br><br>
+        s.shipmentNumber === number
 
-المستلم:
-${shipment.receiver_name}
+    );
 
-<br><br>
 
-من:
-${shipment.from_city}
 
-<br><br>
+    if(!shipment){
 
-إلى:
-${shipment.to_city}
+        document.body.innerHTML =
 
-<br><br>
+        "<h2 style='text-align:center'>الشحنة غير موجودة</h2>";
 
-الوزن:
-${shipment.weight}
+        return;
 
-<br><br>
+    }
 
-القطع:
-${shipment.pieces}
 
-<br><br>
 
-السعر:
-${shipment.price}
+    document.getElementById(
+    "shipmentNumber"
+    ).innerText =
 
-`;
+    shipment.shipmentNumber;
+
+
+
+    document.getElementById(
+    "senderData"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.senderName}
+    <br><br>
+
+    الجوال:
+    ${shipment.senderPhone}
+    <br><br>
+
+    العنوان:
+    ${shipment.senderCity}
+    `;
+
+
+
+    document.getElementById(
+    "receiverData"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.receiverName}
+    <br><br>
+
+    الجوال:
+    ${shipment.receiverPhone}
+    <br><br>
+
+    العنوان:
+    ${shipment.receiverCity}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentDetails"
+    ).innerHTML =
+
+    `
+    عدد القطع:
+    ${shipment.pieces}
+    <br><br>
+
+    الوزن:
+    ${shipment.weight} كجم
+    <br><br>
+
+    السعر:
+    ${shipment.price} ريال
+    <br><br>
+
+    التغليف:
+    ${shipment.packaging}
+    <br><br>
+
+    نوع الخدمة:
+    ${shipment.deliveryType}
+    <br><br>
+
+    التاريخ:
+    ${shipment.date}
+    <br><br>
+
+    الوقت:
+    ${shipment.time}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentStatus"
+    ).innerText =
+
+    shipment.status;
 
 }
+
+
+
+loadShipment();
 
 </script>
 
 </body>
-
 </html>

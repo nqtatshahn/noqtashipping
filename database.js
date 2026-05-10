@@ -1,134 +1,215 @@
-const sqlite3 = require("sqlite3").verbose();
+const fs = require("fs");
+const path = require("path");
 
-const db = new sqlite3.Database("./noqtashipping.db", (err) => {
 
-if(err){
 
-console.log("Database Error");
+/* =========================
+   مجلد البيانات
+========================= */
 
-}else{
+const dataFolder = path.join(
+    __dirname,
+    "data"
+);
 
-console.log("Database Connected ✅");
+
+
+/* =========================
+   ملف الشحنات
+========================= */
+
+const shipmentsFile = path.join(
+    dataFolder,
+    "shipments.json"
+);
+
+
+
+/* =========================
+   إنشاء المجلد
+========================= */
+
+if(!fs.existsSync(dataFolder)){
+
+    fs.mkdirSync(dataFolder);
 
 }
 
-});
 
-db.serialize(() => {
 
-db.run(`
+/* =========================
+   إنشاء ملف الشحنات
+========================= */
 
-CREATE TABLE IF NOT EXISTS shipments (
+if(!fs.existsSync(shipmentsFile)){
 
-id INTEGER PRIMARY KEY AUTOINCREMENT,
+    fs.writeFileSync(
+        shipmentsFile,
+        "[]"
+    );
 
-shipment_number TEXT,
+}
 
-sender_name TEXT,
 
-sender_phone TEXT,
 
-sender_address TEXT,
+/* =========================
+   قراءة الشحنات
+========================= */
 
-receiver_name TEXT,
+function getShipments(){
 
-receiver_phone TEXT,
+    return JSON.parse(
 
-receiver_address TEXT,
+        fs.readFileSync(
+            shipmentsFile
+        )
 
-weight INTEGER,
+    );
 
-pieces INTEGER,
+}
 
-payment_method TEXT,
 
-price INTEGER,
 
-status TEXT,
+/* =========================
+   حفظ الشحنات
+========================= */
 
-employee_number TEXT,
+function saveShipments(data){
 
-date TEXT,
+    fs.writeFileSync(
 
-time TEXT
+        shipmentsFile,
 
-)
+        JSON.stringify(
+            data,
+            null,
+            2
+        )
 
-`);
+    );
 
-db.run(`
+}
 
-CREATE TABLE IF NOT EXISTS employees (
 
-id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-employee_number TEXT,
+/* =========================
+   إضافة شحنة
+========================= */
 
-name TEXT,
+function addShipment(shipment){
 
-phone TEXT,
+    const shipments =
+    getShipments();
 
-email TEXT,
+    shipments.push(shipment);
 
-national_id TEXT,
+    saveShipments(shipments);
 
-password TEXT
+}
 
-)
 
-`);
 
-db.run(`
+/* =========================
+   حذف شحنة
+========================= */
 
-CREATE TABLE IF NOT EXISTS customers (
+function deleteShipment(
+shipmentNumber
+){
 
-id INTEGER PRIMARY KEY AUTOINCREMENT,
+    const shipments =
+    getShipments();
 
-customer_number TEXT,
+    const filtered =
+    shipments.filter(
 
-name TEXT,
+        shipment =>
 
-phone TEXT,
+        shipment.shipmentNumber !==
+        shipmentNumber
 
-phone2 TEXT,
+    );
 
-email TEXT,
+    saveShipments(filtered);
 
-store_name TEXT,
+}
 
-products TEXT
 
-)
 
-`);
+/* =========================
+   تحديث حالة شحنة
+========================= */
 
-db.run(`
+function updateShipmentStatus(
 
-CREATE TABLE IF NOT EXISTS services (
+    shipmentNumber,
+    status
 
-id INTEGER PRIMARY KEY AUTOINCREMENT,
+){
 
-invoice_number TEXT,
+    const shipments =
+    getShipments();
 
-service_type TEXT,
+    shipments.forEach(shipment => {
 
-customer_name TEXT,
+        if(
+        shipment.shipmentNumber ===
+        shipmentNumber
+        ){
 
-phone TEXT,
+            shipment.status =
+            status;
 
-details TEXT,
+        }
 
-price INTEGER,
+    });
 
-employee_number TEXT,
+    saveShipments(shipments);
 
-date TEXT,
-time TEXT
+}
 
-)
 
-`);
 
-});
+/* =========================
+   البحث عن شحنة
+========================= */
 
-module.exports = db;
+function findShipment(
+shipmentNumber
+){
+
+    const shipments =
+    getShipments();
+
+    return shipments.find(
+
+        shipment =>
+
+        shipment.shipmentNumber ===
+        shipmentNumber
+
+    );
+
+}
+
+
+
+/* =========================
+   تصدير الدوال
+========================= */
+
+module.exports = {
+
+    getShipments,
+
+    saveShipments,
+
+    addShipment,
+
+    deleteShipment,
+
+    updateShipmentStatus,
+
+    findShipment
+
+};

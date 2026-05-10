@@ -1,180 +1,426 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>بوليصة شحن | نقطة شحن</title>
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="label-style.css">
+<title>بوليصة الشحنة | نقطة شحن</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+    background:#f5f5f5;
+    padding:20px;
+}
+
+.label-card{
+
+    max-width:450px;
+
+    margin:auto;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    box-shadow:0 0 15px rgba(0,0,0,.1);
+
+}
+
+.logo{
+
+    text-align:center;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    color:#ff9800;
+
+    margin-bottom:20px;
+
+}
+
+.shipment-number{
+
+    background:#ff9800;
+
+    color:white;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    margin-bottom:20px;
+
+}
+
+.section{
+
+    background:#fafafa;
+
+    border-radius:15px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+}
+
+.section-title{
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    margin-bottom:10px;
+
+    color:#666;
+
+}
+
+.section-content{
+
+    line-height:2;
+
+    font-size:17px;
+
+}
+
+.status{
+
+    background:#4caf50;
+
+    color:white;
+
+    text-align:center;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+}
+
+.print-btn{
+
+    width:100%;
+
+    margin-top:20px;
+
+    background:#ff9800;
+
+    color:white;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    font-size:20px;
+
+    cursor:pointer;
+
+}
+
+.footer{
+
+    text-align:center;
+
+    margin-top:25px;
+
+    color:#777;
+
+}
+
+@media print{
+
+    .print-btn{
+
+        display:none;
+
+    }
+
+}
+
+</style>
 
 </head>
 
 <body>
 
-<div class="label">
-
-<div class="header">
+<div class="label-card">
 
 <div class="logo">
+
 🚚 نقطة شحن
-</div>
-
-<div class="company">
-Noqta Shipping
-</div>
 
 </div>
+
+
+
+<div
+class="shipment-number"
+id="shipmentNumber">
+
+HB-2026-0001
+
+</div>
+
+
 
 <div class="section">
 
 <div class="section-title">
-📦 معلومات الشحنة
+
+بيانات المرسل
+
 </div>
 
-<div class="info">
-رقم الشحنة: <span id="shipmentNumber">NQ45872</span>
-</div>
+<div
+class="section-content"
+id="senderData">
 
-<div class="info">
-الحالة: تم الشحن
-</div>
-
-<div class="info">
-التاريخ: 2026/05/09
-</div>
-
-<div class="info">
-الوقت: 3:45 PM
-</div>
-
-<div class="info">
-رقم الموظف: 10234
 </div>
 
 </div>
+
+
 
 <div class="section">
 
 <div class="section-title">
-📤 بيانات المرسل
+
+بيانات المستلم
+
 </div>
 
-<div class="info">
-الاسم: فيصل ناصر
-</div>
+<div
+class="section-content"
+id="receiverData">
 
-<div class="info">
-الجوال: 0555555555
-</div>
-
-<div class="info">
-العنوان: الرياض - حي النرجس
 </div>
 
 </div>
+
+
 
 <div class="section">
 
 <div class="section-title">
-📥 بيانات المستلم
+
+تفاصيل الشحنة
+
 </div>
 
-<div class="info">
-الاسم: محمد خالد
-</div>
+<div
+class="section-content"
+id="shipmentDetails">
 
-<div class="info">
-الجوال: 0500000000
-</div>
-
-<div class="info">
-العنوان: جدة - حي السلامة
 </div>
 
 </div>
 
-<div class="section">
 
-<div class="section-title">
-📦 تفاصيل الشحنة
-</div>
 
-<div class="info">
-الوزن: 12 كيلو
-</div>
+<div
+class="status"
+id="shipmentStatus">
 
-<div class="info">
-عدد القطع: 2
-</div>
-
-<div class="info">
-طريقة الدفع: المستلم
-</div>
-
-<div class="info">
-المبلغ: 76 ريال
-</div>
+جديدة
 
 </div>
 
-<div class="barcode">
 
-||||||||||||||||||||||||||||
 
-</div>
-
-<div class="qrcode">
-
-<img id="qrImage" width="180">
-
-</div>
-
-<button class="print-btn" onclick="window.print()">
+<button
+class="print-btn"
+onclick="window.print()">
 
 🖨️ طباعة البوليصة
 
 </button>
 
+
+
+<div class="footer">
+
+شكراً لاختياركم نقطة شحن ❤️
+
 </div>
+
+</div>
+
+
 
 <script>
 
-async function generateQR(){
+async function loadShipment(){
 
-let shipmentNumber =
-document.getElementById("shipmentNumber").innerText;
+    const params =
+    new URLSearchParams(
+    window.location.search
+    );
 
-let response = await fetch("/generate-qr", {
+    const number =
+    params.get("number");
 
-method:"POST",
 
-headers:{
-"Content-Type":"application/json"
-},
 
-body: JSON.stringify({
-shipment_number:shipmentNumber
-})
+    const response =
+    await fetch("/shipments");
 
-});
+    const shipments =
+    await response.json();
 
-let result = await response.json();
 
-if(result.success){
 
-document.getElementById("qrImage").src =
-result.qr;
+    const shipment =
+    shipments.find(
+
+        s =>
+
+        s.shipmentNumber === number
+
+    );
+
+
+
+    if(!shipment){
+
+        document.body.innerHTML =
+
+        "<h2 style='text-align:center'>الشحنة غير موجودة</h2>";
+
+        return;
+
+    }
+
+
+
+    document.getElementById(
+    "shipmentNumber"
+    ).innerText =
+
+    shipment.shipmentNumber;
+
+
+
+    document.getElementById(
+    "senderData"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.senderName}
+
+    <br><br>
+
+    الجوال:
+    ${shipment.senderPhone}
+
+    <br><br>
+
+    العنوان:
+    ${shipment.senderCity}
+    `;
+
+
+
+    document.getElementById(
+    "receiverData"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.receiverName}
+
+    <br><br>
+
+    الجوال:
+    ${shipment.receiverPhone}
+
+    <br><br>
+
+    العنوان:
+    ${shipment.receiverCity}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentDetails"
+    ).innerHTML =
+
+    `
+    عدد القطع:
+    ${shipment.pieces}
+
+    <br><br>
+
+    الوزن:
+    ${shipment.weight} كجم
+
+    <br><br>
+
+    السعر:
+    ${shipment.price} ريال
+
+    <br><br>
+
+    التغليف:
+    ${shipment.packaging}
+
+    <br><br>
+
+    نوع الخدمة:
+    ${shipment.deliveryType}
+
+    <br><br>
+
+    التاريخ:
+    ${shipment.date}
+
+    <br><br>
+
+    الوقت:
+    ${shipment.time}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentStatus"
+    ).innerText =
+
+    shipment.status;
 
 }
 
-}
 
-generateQR();
+
+loadShipment();
 
 </script>
 
 </body>
+
 </html>

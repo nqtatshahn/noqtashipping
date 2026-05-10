@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
@@ -8,54 +8,120 @@
 <meta name="viewport"
 content="width=device-width, initial-scale=1.0">
 
-<title>أرشيف الفواتير | نقطة شحن</title>
+<title>الفواتير | نقطة شحن</title>
 
 <link rel="stylesheet" href="style.css">
 
 <style>
 
-.search-box{
-margin-bottom:20px;
+.invoice-card{
+
+    background:#1d1d1d;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-top:20px;
+
 }
 
-.search-box input{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#1c1c1c;
-color:white;
-font-size:16px;
+.invoice-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:15px;
+
+    margin-bottom:20px;
+
 }
 
-table{
-width:100%;
-border-collapse:collapse;
-background:#1c1c1c;
-color:white;
-border-radius:15px;
-overflow:hidden;
+.invoice-title{
+
+    font-size:28px;
+
+    color:#ffb300;
+
+    font-weight:bold;
+
 }
 
-th, td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #333;
+.invoice-number{
+
+    background:#ff9800;
+
+    color:white;
+
+    padding:10px 15px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
 }
 
-th{
-background:#FFD700;
-color:black;
+.invoice-section{
+
+    background:#2a2a2a;
+
+    border-radius:15px;
+
+    padding:15px;
+
+    margin-bottom:15px;
+
+}
+
+.invoice-section h3{
+
+    color:#ffb300;
+
+    margin-bottom:10px;
+
+}
+
+.invoice-section p{
+
+    line-height:2;
+
+}
+
+.invoice-total{
+
+    background:#4caf50;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    margin-top:20px;
+
 }
 
 .print-btn{
-background:#FFD700;
-color:black;
-padding:8px 12px;
-border:none;
-border-radius:10px;
-font-weight:bold;
-cursor:pointer;
+
+    width:100%;
+
+    margin-top:20px;
+
+}
+
+.table-container{
+
+    margin-top:40px;
+
 }
 
 </style>
@@ -64,20 +130,135 @@ cursor:pointer;
 
 <body>
 
-<div class="main">
+<div class="container">
 
-<h1>🧾 أرشيف الفواتير</h1>
+<h1>
+🧾 الفواتير
+</h1>
+
+
+
+<div class="top-buttons">
+
+<a href="/shipments.html">
+إضافة شحنة
+</a>
+
+<a href="/list.html">
+قائمة الشحنات
+</a>
+
+<a href="/reports.html">
+التقارير
+</a>
+
+<a href="/tracking.html">
+التتبع
+</a>
+
+</div>
+
+
 
 <div class="search-box">
 
 <input
 type="text"
-id="search"
-placeholder="بحث برقم الفاتورة..."
-onkeyup="searchInvoices()"
+id="invoiceSearch"
+placeholder="أدخل رقم الشحنة"
 >
 
+<button onclick="loadInvoice()">
+
+عرض الفاتورة
+
+</button>
+
 </div>
+
+
+
+<div
+class="invoice-card"
+id="invoiceCard"
+
+style="display:none;">
+
+<div class="invoice-header">
+
+<div class="invoice-title">
+
+نقطة شحن
+
+</div>
+
+<div
+class="invoice-number"
+id="invoiceNumber">
+
+</div>
+
+</div>
+
+
+
+<div class="invoice-section">
+
+<h3>
+بيانات المرسل
+</h3>
+
+<p id="senderInfo"></p>
+
+</div>
+
+
+
+<div class="invoice-section">
+
+<h3>
+بيانات المستلم
+</h3>
+
+<p id="receiverInfo"></p>
+
+</div>
+
+
+
+<div class="invoice-section">
+
+<h3>
+تفاصيل الشحنة
+</h3>
+
+<p id="shipmentInfo"></p>
+
+</div>
+
+
+
+<div
+class="invoice-total"
+id="invoiceTotal">
+
+</div>
+
+
+
+<button
+class="print-btn"
+onclick="window.print()">
+
+🖨️ طباعة الفاتورة
+
+</button>
+
+</div>
+
+
+
+<div class="table-container">
 
 <table>
 
@@ -85,118 +266,263 @@ onkeyup="searchInvoices()"
 
 <tr>
 
-<th>رقم الفاتورة</th>
+<th>
+رقم الشحنة
+</th>
 
-<th>الخدمة</th>
+<th>
+المرسل
+</th>
 
-<th>العميل</th>
+<th>
+المستلم
+</th>
 
-<th>المبلغ</th>
+<th>
+السعر
+</th>
 
-<th>الموظف</th>
-
-<th>التاريخ</th>
-
-<th>طباعة</th>
+<th>
+التاريخ
+</th>
 
 </tr>
 
 </thead>
 
-<tbody id="invoicesTable">
-
-</tbody>
+<tbody id="invoiceTable"></tbody>
 
 </table>
 
 </div>
 
+</div>
+
+
+
 <script>
 
-let allInvoices = [];
+let shipmentsData = [];
 
-async function loadInvoices(){
 
-let response =
-await fetch("/services");
 
-allInvoices =
-await response.json();
+/* =========================
+   تحميل البيانات
+========================= */
 
-displayInvoices(allInvoices);
+async function loadShipments(){
 
-}
+    const response =
+    await fetch("/shipments");
 
-function displayInvoices(invoices){
+    shipmentsData =
+    await response.json();
 
-let table =
-document.getElementById("invoicesTable");
-
-table.innerHTML = "";
-
-invoices.forEach(invoice => {
-
-table.innerHTML += `
-
-<tr>
-
-<td>${invoice.invoice_number}</td>
-
-<td>${invoice.service_type}</td>
-
-<td>${invoice.customer_name}</td>
-
-<td>${invoice.price} ريال</td>
-
-<td>${invoice.employee_number}</td>
-
-<td>${invoice.date}</td>
-
-<td>
-
-<button class="print-btn"
-onclick="printInvoice('${invoice.invoice_number}')">
-
-🖨️ طباعة
-
-</button>
-
-</td>
-
-</tr>
-
-`;
-
-});
+    renderTable();
 
 }
 
-function searchInvoices(){
 
-let search =
-document.getElementById("search")
-.value
-.toLowerCase();
 
-let filtered = allInvoices.filter(invoice => {
+/* =========================
+   عرض الجدول
+========================= */
 
-return invoice.invoice_number
-.toLowerCase()
-.includes(search);
+function renderTable(){
 
-});
+    const table =
+    document.getElementById(
+    "invoiceTable"
+    );
 
-displayInvoices(filtered);
+
+
+    table.innerHTML = "";
+
+
+
+    shipmentsData.forEach(shipment => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>
+            ${shipment.shipmentNumber}
+            </td>
+
+            <td>
+            ${shipment.senderName}
+            </td>
+
+            <td>
+            ${shipment.receiverName}
+            </td>
+
+            <td>
+            ${shipment.price} ريال
+            </td>
+
+            <td>
+            ${shipment.date}
+            </td>
+
+        </tr>
+
+        `;
+
+    });
 
 }
 
-function printInvoice(invoice){
 
-window.print();
+
+/* =========================
+   تحميل الفاتورة
+========================= */
+
+function loadInvoice(){
+
+    const number =
+    document.getElementById(
+    "invoiceSearch"
+    ).value;
+
+
+
+    const shipment =
+    shipmentsData.find(
+
+        s =>
+
+        s.shipmentNumber === number
+
+    );
+
+
+
+    if(!shipment){
+
+        alert("الفاتورة غير موجودة");
+
+        return;
+
+    }
+
+
+
+    document.getElementById(
+    "invoiceCard"
+    ).style.display = "block";
+
+
+
+    document.getElementById(
+    "invoiceNumber"
+    ).innerText =
+
+    shipment.shipmentNumber;
+
+
+
+    document.getElementById(
+    "senderInfo"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.senderName}
+
+    <br>
+
+    الجوال:
+    ${shipment.senderPhone}
+
+    <br>
+
+    العنوان:
+    ${shipment.senderCity}
+    `;
+
+
+
+    document.getElementById(
+    "receiverInfo"
+    ).innerHTML =
+
+    `
+    الاسم:
+    ${shipment.receiverName}
+
+    <br>
+
+    الجوال:
+    ${shipment.receiverPhone}
+
+    <br>
+
+    العنوان:
+    ${shipment.receiverCity}
+    `;
+
+
+
+    document.getElementById(
+    "shipmentInfo"
+    ).innerHTML =
+
+    `
+    عدد القطع:
+    ${shipment.pieces}
+
+    <br>
+
+    الوزن:
+    ${shipment.weight} كجم
+
+    <br>
+
+    التغليف:
+    ${shipment.packaging}
+
+    <br>
+
+    نوع الخدمة:
+    ${shipment.deliveryType}
+
+    <br>
+
+    الحالة:
+    ${shipment.status}
+
+    <br>
+
+    التاريخ:
+    ${shipment.date}
+
+    <br>
+
+    الوقت:
+    ${shipment.time}
+    `;
+
+
+
+    document.getElementById(
+    "invoiceTotal"
+    ).innerText =
+
+    "الإجمالي: " +
+
+    shipment.price +
+
+    " ريال";
 
 }
 
-loadInvoices();
+
+
+loadShipments();
 
 </script>
 

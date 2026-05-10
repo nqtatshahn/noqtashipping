@@ -1,25 +1,51 @@
 const express = require("express");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
+const PORT = process.env.PORT || 3000;
+
+
+
+/* =========================
+   الإعدادات
+========================= */
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+app.use(express.urlencoded({
+  extended: true
+}));
 
 app.use(express.static("public"));
 
 
 
 /* =========================
-   ملف البيانات
+   إنشاء مجلد البيانات
 ========================= */
 
-if (!fs.existsSync("./data")) {
-  fs.mkdirSync("./data");
+const dataFolder = path.join(__dirname, "data");
+
+const shipmentsFile = path.join(
+  dataFolder,
+  "shipments.json"
+);
+
+if (!fs.existsSync(dataFolder)) {
+
+  fs.mkdirSync(dataFolder);
+
 }
 
-if (!fs.existsSync("./data/shipments.json")) {
-  fs.writeFileSync("./data/shipments.json", "[]");
+if (!fs.existsSync(shipmentsFile)) {
+
+  fs.writeFileSync(
+    shipmentsFile,
+    "[]"
+  );
+
 }
 
 
@@ -31,7 +57,7 @@ if (!fs.existsSync("./data/shipments.json")) {
 function getShipments() {
 
   return JSON.parse(
-    fs.readFileSync("./data/shipments.json")
+    fs.readFileSync(shipmentsFile)
   );
 
 }
@@ -45,11 +71,27 @@ function getShipments() {
 function saveShipments(data) {
 
   fs.writeFileSync(
-    "./data/shipments.json",
+    shipmentsFile,
     JSON.stringify(data, null, 2)
   );
 
 }
+
+
+
+/* =========================
+   الصفحة الرئيسية
+========================= */
+
+app.get("/", (req, res) => {
+
+  res.sendFile(
+    path.join(__dirname,
+    "public",
+    "index.html")
+  );
+
+});
 
 
 
@@ -61,7 +103,14 @@ app.post("/login", (req, res) => {
 
   const { username, password } = req.body;
 
-  if (username === "admin" && password === "1234") {
+
+
+  /* المدير */
+
+  if (
+    username === "admin" &&
+    password === "1234"
+  ) {
 
     return res.json({
       success: true,
@@ -70,7 +119,14 @@ app.post("/login", (req, res) => {
 
   }
 
-  if (username === "employee" && password === "1234") {
+
+
+  /* الموظف */
+
+  if (
+    username === "employee" &&
+    password === "1234"
+  ) {
 
     return res.json({
       success: true,
@@ -78,6 +134,8 @@ app.post("/login", (req, res) => {
     });
 
   }
+
+
 
   res.json({
     success: false
@@ -97,13 +155,22 @@ app.post("/add-shipment", (req, res) => {
 
     const shipments = getShipments();
 
+
+
     const shipmentNumber =
+
       "HB-2026-" +
-      Math.floor(1000 + Math.random() * 9000);
+
+      String(shipments.length + 1)
+      .padStart(4, "0");
+
+
 
     const newShipment = {
 
       shipmentNumber:
+
+
 
       shipmentNumber,
 
@@ -111,67 +178,67 @@ app.post("/add-shipment", (req, res) => {
 
       senderName:
 
-      req.body.senderName,
+      req.body.senderName || "",
 
 
 
       senderPhone:
 
-      req.body.senderPhone,
+      req.body.senderPhone || "",
 
 
 
       senderCity:
 
-      req.body.senderCity,
+      req.body.senderCity || "",
 
 
 
       receiverName:
 
-      req.body.receiverName,
+      req.body.receiverName || "",
 
 
 
       receiverPhone:
 
-      req.body.receiverPhone,
+      req.body.receiverPhone || "",
 
 
 
       receiverCity:
 
-      req.body.receiverCity,
+      req.body.receiverCity || "",
 
 
 
       pieces:
 
-      req.body.pieces,
+      req.body.pieces || 0,
 
 
 
       weight:
 
-      req.body.weight,
+      req.body.weight || 0,
 
 
 
       price:
 
-      req.body.price,
+      req.body.price || 0,
 
 
 
       packaging:
 
-      req.body.packaging,
+      req.body.packaging || "بدون",
 
 
 
       deliveryType:
 
-      req.body.deliveryType,
+      req.body.deliveryType || "توصيل",
 
 
 
@@ -183,13 +250,15 @@ app.post("/add-shipment", (req, res) => {
 
       date:
 
-      new Date().toLocaleDateString("ar-SA"),
+      new Date()
+      .toLocaleDateString("ar-SA"),
 
 
 
       time:
 
-      new Date().toLocaleTimeString("ar-SA")
+      new Date()
+      .toLocaleTimeString("ar-SA")
 
     };
 
@@ -199,9 +268,14 @@ app.post("/add-shipment", (req, res) => {
 
     saveShipments(shipments);
 
+
+
     res.json({
+
       success: true,
+
       shipmentNumber
+
     });
 
   } catch (error) {
@@ -224,36 +298,39 @@ app.post("/add-shipment", (req, res) => {
 
 app.get("/shipments", (req, res) => {
 
-  res.json(getShipments());
+  res.json(
+    getShipments()
+  );
 
 });
 
 
 
 /* =========================
-   تحديث الحالة
+   تحديث حالة الشحنة
 ========================= */
 
 app.post("/update-status", (req, res) => {
 
   const shipments = getShipments();
 
-  const updated = shipments.map(shipment => {
+  shipments.forEach(shipment => {
 
     if (
+
       shipment.shipmentNumber ===
       req.body.shipmentNumber
+
     ) {
 
-      shipment.status = req.body.status;
+      shipment.status =
+      req.body.status;
 
     }
 
-    return shipment;
-
   });
 
-  saveShipments(updated);
+  saveShipments(shipments);
 
   res.json({
     success: true
@@ -276,6 +353,7 @@ app.post("/delete-shipment", (req, res) => {
     shipment =>
 
     shipment.shipmentNumber !==
+
     req.body.shipmentNumber
 
   );
@@ -293,8 +371,6 @@ app.post("/delete-shipment", (req, res) => {
 /* =========================
    تشغيل السيرفر
 ========================= */
-
-const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
 

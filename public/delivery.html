@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
@@ -14,91 +14,62 @@ content="width=device-width, initial-scale=1.0">
 
 <style>
 
-.form-box{
-background:#1c1c1c;
-padding:30px;
-border-radius:20px;
-max-width:700px;
-margin:auto;
-box-shadow:0 0 15px rgba(255,215,0,0.1);
-margin-bottom:30px;
+.delivery-card{
+
+    background:#1d1d1d;
+
+    border-radius:20px;
+
+    padding:20px;
+
+    margin-top:20px;
+
 }
 
-.form-box input,
-.form-box select{
-width:100%;
-padding:15px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#2c2c2c;
-color:white;
-font-size:16px;
+.delivery-type{
+
+    display:flex;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+    margin-top:10px;
+
 }
 
-.form-box button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-color:black;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+.delivery-badge{
+
+    background:#2a2a2a;
+
+    padding:10px 15px;
+
+    border-radius:10px;
+
 }
 
 .price-box{
-background:#FFD700;
-color:black;
-padding:15px;
-border-radius:12px;
-font-size:20px;
-font-weight:bold;
-margin-bottom:15px;
-text-align:center;
+
+    background:#4caf50;
+
+    padding:15px;
+
+    border-radius:15px;
+
+    text-align:center;
+
+    font-size:24px;
+
+    font-weight:bold;
+
+    margin-top:15px;
+
 }
 
-.result{
-background:#111;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-color:white;
-}
+.save-btn{
 
-.print-btn{
-background:#FFD700;
-color:black;
-padding:12px;
-border:none;
-border-radius:10px;
-font-size:16px;
-font-weight:bold;
-cursor:pointer;
-margin-top:15px;
-width:100%;
-}
+    margin-top:15px;
 
-table{
-width:100%;
-border-collapse:collapse;
-background:#1c1c1c;
-color:white;
-border-radius:15px;
-overflow:hidden;
-margin-top:30px;
-}
-
-th, td{
-padding:15px;
-text-align:center;
-border-bottom:1px solid #333;
-}
-
-th{
-background:#FFD700;
-color:black;
 }
 
 </style>
@@ -107,64 +78,81 @@ color:black;
 
 <body>
 
-<div class="main">
+<div class="container">
 
-<h1>🚚 التوصيل والاحتفاظ</h1>
+<h1>
+🚚 التوصيل والاحتفاظ
+</h1>
 
-<div class="form-box">
+
+
+<div class="top-buttons">
+
+<a href="/shipments.html">
+إضافة شحنة
+</a>
+
+<a href="/list.html">
+قائمة الشحنات
+</a>
+
+<a href="/reports.html">
+التقارير
+</a>
+
+<a href="/tracking.html">
+التتبع
+</a>
+
+</div>
+
+
+
+<form id="deliveryForm">
 
 <input
 type="text"
-id="customerName"
-placeholder="اسم العميل"
+id="shipmentNumber"
+placeholder="رقم الشحنة"
+required
 >
 
-<input
-type="text"
-id="phone"
-placeholder="رقم الجوال"
->
+<select id="deliveryType">
 
-<select
-id="service"
-onchange="calculateDeliveryPrice()"
->
-
-<option value="">
-اختر الخدمة
+<option value="توصيل">
+توصيل
 </option>
 
-<option value="pickup_delivery">
-جلب من شركة + توصيل منزل
+<option value="احتفاظ">
+احتفاظ
 </option>
 
-<option value="delivery_only">
-توصيل شحنة محتفظ بها
-</option>
-
-<option value="storage">
-احتفاظ بالشحنة
+<option value="توصيل سريع">
+توصيل سريع
 </option>
 
 </select>
 
-<div class="price-box" id="priceBox">
+<input
+type="number"
+id="deliveryPrice"
+placeholder="السعر"
+readonly
+>
 
-المبلغ: 0 ريال
+<button
+class="save-btn"
+type="submit">
 
-</div>
-
-<button onclick="addDelivery()">
-
-حفظ العملية
+حفظ
 
 </button>
 
-<div class="result" id="result">
+</form>
 
-</div>
 
-</div>
+
+<div class="table-container">
 
 <table>
 
@@ -172,206 +160,257 @@ onchange="calculateDeliveryPrice()"
 
 <tr>
 
-<th>رقم الفاتورة</th>
+<th>
+رقم الشحنة
+</th>
 
-<th>العميل</th>
+<th>
+نوع الخدمة
+</th>
 
-<th>الخدمة</th>
+<th>
+السعر
+</th>
 
-<th>المبلغ</th>
-
-<th>الموظف</th>
+<th>
+الحالة
+</th>
 
 </tr>
 
 </thead>
 
-<tbody id="deliveryTable">
-
-</tbody>
+<tbody id="deliveryTable"></tbody>
 
 </table>
 
 </div>
 
+</div>
+
+
+
 <script>
 
-let deliveryList = [];
+const deliveryType =
+document.getElementById(
+"deliveryType"
+);
+
+const deliveryPrice =
+document.getElementById(
+"deliveryPrice"
+);
+
+
+
+/* =========================
+   حساب السعر تلقائي
+========================= */
 
 function calculateDeliveryPrice(){
 
-let service =
-document.getElementById("service").value;
+    if(
+    deliveryType.value ===
+    "توصيل"
+    ){
 
-let total = 0;
+        deliveryPrice.value = 25;
 
-if(service === "pickup_delivery"){
+    }
 
-total = 25;
+    else if(
+    deliveryType.value ===
+    "احتفاظ"
+    ){
 
-}
+        deliveryPrice.value = 15;
 
-if(service === "delivery_only"){
+    }
 
-total = 15;
+    else if(
+    deliveryType.value ===
+    "توصيل سريع"
+    ){
 
-}
+        deliveryPrice.value = 50;
 
-if(service === "storage"){
-
-total = 4;
-
-}
-
-document.getElementById("priceBox").innerText =
-
-"المبلغ: " + total + " ريال";
-
-}
-
-async function addDelivery(){
-
-let service =
-document.getElementById("service").value;
-
-let total = 0;
-
-let serviceName = "";
-
-if(service === "pickup_delivery"){
-
-total = 25;
-
-serviceName = "جلب + توصيل";
+    }
 
 }
 
-if(service === "delivery_only"){
+deliveryType.addEventListener(
+"change",
+calculateDeliveryPrice
+);
 
-total = 15;
+calculateDeliveryPrice();
 
-serviceName = "توصيل فقط";
 
-}
 
-if(service === "storage"){
+/* =========================
+   حفظ الخدمة
+========================= */
 
-total = 4;
+document
+.getElementById("deliveryForm")
 
-serviceName = "احتفاظ بالشحنة";
+.addEventListener(
+"submit",
 
-}
+async function(e){
 
-let invoiceNumber =
-"INV" + Math.floor(10000 + Math.random() * 90000);
+    e.preventDefault();
 
-let date = new Date();
 
-let delivery = {
 
-invoice_number: invoiceNumber,
+    const shipmentNumber =
+    document.getElementById(
+    "shipmentNumber"
+    ).value;
 
-service_type: serviceName,
 
-customer_name:
-document.getElementById("customerName").value,
 
-phone:
-document.getElementById("phone").value,
+    const response =
+    await fetch("/shipments");
 
-details:
-serviceName,
+    const shipments =
+    await response.json();
 
-price:
-total,
 
-employee_number:
-localStorage.getItem("employee"),
 
-date:
-date.toLocaleDateString(),
+    const shipment =
+    shipments.find(
 
-time:
-date.toLocaleTimeString()
+        s =>
 
-};
+        s.shipmentNumber ===
+        shipmentNumber
 
-await fetch("/add-service", {
+    );
 
-method:"POST",
 
-headers:{
-"Content-Type":"application/json"
-},
 
-body: JSON.stringify(delivery)
+    if(!shipment){
+
+        alert("الشحنة غير موجودة");
+
+        return;
+
+    }
+
+
+
+    shipment.deliveryType =
+    deliveryType.value;
+
+
+
+    shipment.deliveryPrice =
+    deliveryPrice.value;
+
+
+
+    shipment.status =
+    "قيد التوصيل";
+
+
+
+    await fetch(
+
+        "/update-status",
+
+        {
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+                shipmentNumber,
+
+                status:
+                shipment.status
+
+            })
+
+        }
+
+    );
+
+
+
+    alert("تم حفظ الخدمة");
+
+    loadDelivery();
 
 });
 
-deliveryList.push(delivery);
+
+
+/* =========================
+   عرض البيانات
+========================= */
+
+async function loadDelivery(){
+
+    const response =
+    await fetch("/shipments");
+
+    const shipments =
+    await response.json();
+
+
+
+    const table =
+    document.getElementById(
+    "deliveryTable"
+    );
+
+
+
+    table.innerHTML = "";
+
+
+
+    shipments.forEach(shipment => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>
+            ${shipment.shipmentNumber}
+            </td>
+
+            <td>
+            ${shipment.deliveryType || "-"}
+            </td>
+
+            <td>
+            ${shipment.deliveryPrice || 0}
+            ريال
+            </td>
+
+            <td>
+            ${shipment.status}
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+
 
 loadDelivery();
-
-document.getElementById("result").innerHTML = `
-
-<h2>✅ تم حفظ الفاتورة</h2>
-
-<p><b>رقم الفاتورة:</b>
-${invoiceNumber}</p>
-
-<p><b>الخدمة:</b>
-${serviceName}</p>
-
-<p><b>المبلغ:</b>
-${total} ريال</p>
-
-<button class="print-btn"
-onclick="printInvoice('${invoiceNumber}')">
-
-🖨️ طباعة الفاتورة
-
-</button>
-
-`;
-
-}
-
-function loadDelivery(){
-
-let table =
-document.getElementById("deliveryTable");
-
-table.innerHTML = "";
-
-deliveryList.forEach(item => {
-
-table.innerHTML += `
-
-<tr>
-
-<td>${item.invoice_number}</td>
-
-<td>${item.customer_name}</td>
-
-<td>${item.service_type}</td>
-
-<td>${item.price} ريال</td>
-
-<td>${item.employee_number}</td>
-
-</tr>
-
-`;
-
-});
-
-}
-
-function printInvoice(invoice){
-
-window.print();
-
-}
 
 </script>
 

@@ -1,73 +1,129 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>نقطة شحن | تسجيل الدخول</title>
+
+<link rel="stylesheet" href="style.css">
 
 <style>
 
 body{
-margin:0;
-padding:0;
-background:#0f0f0f;
-font-family:Tahoma;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-direction:rtl;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    min-height:100vh;
+
+    background:#111;
+
 }
 
-.login-box{
-background:#1a1a1a;
-padding:40px;
-border-radius:20px;
-width:350px;
-box-shadow:0 0 20px rgba(255,215,0,0.3);
-text-align:center;
+.login-card{
+
+    width:100%;
+
+    max-width:400px;
+
+    background:#1d1d1d;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    box-shadow:0 0 15px rgba(0,0,0,.4);
+
 }
 
 .logo{
-font-size:35px;
-color:#FFD700;
-margin-bottom:10px;
-font-weight:bold;
+
+    text-align:center;
+
+    font-size:40px;
+
+    color:#ffb300;
+
+    margin-bottom:15px;
+
 }
 
-.sub{
-color:white;
-margin-bottom:30px;
+.title{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+    font-size:28px;
+
+    color:white;
+
+}
+
+form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:15px;
+
 }
 
 input{
-width:100%;
-padding:15px;
-margin-bottom:15px;
-border:none;
-border-radius:10px;
-background:#2c2c2c;
-color:white;
-font-size:16px;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
 }
 
 button{
-width:100%;
-padding:15px;
-border:none;
-border-radius:10px;
-background:#FFD700;
-color:black;
-font-size:18px;
-font-weight:bold;
-cursor:pointer;
+
+    background:#ff9800;
+
+    color:white;
+
+    border:none;
+
+    padding:15px;
+
+    border-radius:10px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
 }
 
 button:hover{
-background:#ffcc00;
+
+    background:#e68900;
+
+}
+
+.note{
+
+    margin-top:20px;
+
+    text-align:center;
+
+    color:#999;
+
+    font-size:14px;
+
 }
 
 </style>
@@ -76,82 +132,152 @@ background:#ffcc00;
 
 <body>
 
-<div class="login-box">
+<div class="login-card">
 
 <div class="logo">
-🚚 نقطة شحن
+
+🚚
+
 </div>
 
-<div class="sub">
-Noqta Shipping
+
+
+<div class="title">
+
+نقطة شحن
+
 </div>
 
-<input type="text" id="employeeNumber" placeholder="الرقم الوظيفي">
 
-<input type="password" id="password" placeholder="كلمة المرور">
 
-<button onclick="login()">
+<form id="loginForm">
+
+<input
+type="text"
+id="username"
+placeholder="اسم المستخدم"
+required
+>
+
+<input
+type="password"
+id="password"
+placeholder="كلمة المرور"
+required
+>
+
+<button type="submit">
+
 تسجيل الدخول
+
 </button>
 
+</form>
+
+
+
+<div class="note">
+
+المدير:
+admin / 1234
+
+<br><br>
+
+الموظف:
+employee / 1234
+
 </div>
+
+</div>
+
+
 
 <script>
 
-async function login(){
+document
+.getElementById("loginForm")
 
-let employeeNumber =
-document.getElementById("employeeNumber").value;
+.addEventListener(
+"submit",
 
-let password =
-document.getElementById("password").value;
+async function(e){
 
-if(
-employeeNumber === "admin"
-&&
-password === "Faisal@12"
-){
+    e.preventDefault();
 
-localStorage.setItem("employee","admin");
 
-window.location.href = "dashboard.html";
 
-return;
+    const username =
+    document.getElementById(
+    "username"
+    ).value;
 
-}
 
-let response = await fetch("/employees");
 
-let employees = await response.json();
+    const password =
+    document.getElementById(
+    "password"
+    ).value;
 
-let employee = employees.find(emp =>
 
-emp.employee_number == employeeNumber
 
-&&
+    const response =
+    await fetch(
 
-emp.password == password
+        "/login",
 
-);
+        {
 
-if(employee){
+            method:"POST",
 
-localStorage.setItem(
-"employee",
-employee.employee_number
-);
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
 
-window.location.href = "dashboard.html";
+            body:JSON.stringify({
 
-}else{
+                username,
+                password
 
-alert("بيانات الدخول غير صحيحة");
+            })
 
-}
+        }
 
-}
+    );
+
+
+
+    const result =
+    await response.json();
+
+
+
+    if(result.success){
+
+        localStorage.setItem(
+        "role",
+        result.role
+        );
+
+
+
+        window.location.href =
+        "/shipments.html";
+
+    }
+
+    else{
+
+        alert(
+        "بيانات الدخول غير صحيحة"
+        );
+
+    }
+
+});
 
 </script>
 
 </body>
+
 </html>

@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>قائمة الشحنات</title>
+<title>قائمة الشحنات | نقطة شحن</title>
 
 <style>
 
@@ -25,12 +25,53 @@ h1{
     margin-bottom:30px;
 }
 
+.top-buttons{
+    max-width:1200px;
+    margin:auto;
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.top-buttons a{
+    background:#222;
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:10px;
+}
+
+.top-buttons a:hover{
+    background:#333;
+}
+
+.search-box{
+    max-width:1200px;
+    margin:auto;
+    margin-bottom:20px;
+}
+
+.search-box input{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+}
+
+.table-container{
+    overflow:auto;
+    max-width:1200px;
+    margin:auto;
+}
+
 table{
     width:100%;
     border-collapse:collapse;
-    background:#1c1c1c;
-    overflow:hidden;
+    background:#1b1b1b;
     border-radius:10px;
+    overflow:hidden;
 }
 
 th{
@@ -45,13 +86,23 @@ td{
     border-bottom:1px solid #333;
 }
 
-select{
+.status-select{
     padding:8px;
+    border:none;
     border-radius:6px;
 }
 
 .print-btn{
     background:#4caf50;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.delete-btn{
+    background:#f44336;
     color:white;
     border:none;
     padding:10px 14px;
@@ -67,6 +118,42 @@ select{
 
 <h1>📦 قائمة الشحنات</h1>
 
+<div class="top-buttons">
+
+<a href="/shipments.html">
+إضافة شحنة
+</a>
+
+<a href="/tracking.html">
+تتبع الشحنات
+</a>
+
+<a href="/packaging.html">
+التغليف
+</a>
+
+<a href="/delivery.html">
+التوصيل والاحتفاظ
+</a>
+
+</div>
+
+
+
+<div class="search-box">
+
+<input
+type="text"
+id="searchInput"
+placeholder="ابحث برقم الشحنة أو الاسم..."
+>
+
+</div>
+
+
+
+<div class="table-container">
+
 <table>
 
 <thead>
@@ -74,12 +161,24 @@ select{
 <tr>
 
 <th>رقم الشحنة</th>
+
 <th>المرسل</th>
+
 <th>المستلم</th>
+
+<th>عنوان المرسل</th>
+
+<th>عنوان المستلم</th>
+
 <th>السعر</th>
+
 <th>الحالة</th>
+
 <th>التاريخ</th>
-<th>طباعة</th>
+
+<th>الطباعة</th>
+
+<th>الحذف</th>
 
 </tr>
 
@@ -89,17 +188,50 @@ select{
 
 </table>
 
+</div>
+
+
+
 <script>
+
+let allShipments = [];
+
+
+
+/* =========================
+   تحميل الشحنات
+========================= */
 
 async function loadShipments(){
 
-    const response = await fetch("/shipments");
+    const response =
+    await fetch("/shipments");
 
-    const shipments = await response.json();
+    const shipments =
+    await response.json();
 
-    const table = document.getElementById("shipmentsTable");
+    allShipments = shipments;
+
+    renderShipments(shipments);
+
+}
+
+
+
+/* =========================
+   عرض الشحنات
+========================= */
+
+function renderShipments(shipments){
+
+    const table =
+    document.getElementById(
+    "shipmentsTable"
+    );
 
     table.innerHTML = "";
+
+
 
     shipments.forEach(shipment => {
 
@@ -107,25 +239,105 @@ async function loadShipments(){
 
         <tr>
 
-            <td>${shipment.shipmentNumber}</td>
+            <td>
+            ${shipment.shipmentNumber}
+            </td>
 
-            <td>${shipment.senderName}</td>
+            <td>
+            ${shipment.senderName}
+            </td>
 
-            <td>${shipment.receiverName}</td>
+            <td>
+            ${shipment.receiverName}
+            </td>
 
-            <td>${shipment.price} ريال</td>
+            <td>
+            ${shipment.senderCity}
+            </td>
 
-            <td>${shipment.status}</td>
+            <td>
+            ${shipment.receiverCity}
+            </td>
 
-            <td>${shipment.date}</td>
+            <td>
+            ${shipment.price} ريال
+            </td>
+
+            <td>
+
+                <select
+                class="status-select"
+                onchange="
+                updateStatus(
+                '${shipment.shipmentNumber}',
+                this.value
+                )">
+
+                    <option
+                    value="جديدة"
+
+                    ${shipment.status === "جديدة"
+                    ? "selected" : ""}>
+
+                    جديدة
+
+                    </option>
+
+                    <option
+                    value="قيد التوصيل"
+
+                    ${shipment.status === "قيد التوصيل"
+                    ? "selected" : ""}>
+
+                    قيد التوصيل
+
+                    </option>
+
+                    <option
+                    value="تم التسليم"
+
+                    ${shipment.status === "تم التسليم"
+                    ? "selected" : ""}>
+
+                    تم التسليم
+
+                    </option>
+
+                </select>
+
+            </td>
+
+            <td>
+            ${shipment.date}
+            </td>
 
             <td>
 
                 <button
                 class="print-btn"
-                onclick="printShipment('${shipment.shipmentNumber}')">
+
+                onclick="
+                printShipment(
+                '${shipment.shipmentNumber}'
+                )">
 
                 طباعة
+
+                </button>
+
+            </td>
+
+            <td>
+
+                <button
+                class="delete-btn"
+
+                onclick="
+                deleteShipment(
+                '${shipment.shipmentNumber}'
+                )">
+
+                حذف
 
                 </button>
 
@@ -139,12 +351,150 @@ async function loadShipments(){
 
 }
 
+
+
+/* =========================
+   تحديث الحالة
+========================= */
+
+async function updateStatus(
+
+    shipmentNumber,
+    status
+
+){
+
+    await fetch(
+
+        "/update-status",
+
+        {
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+                shipmentNumber,
+                status
+
+            })
+
+        }
+
+    );
+
+}
+
+
+
+/* =========================
+   حذف شحنة
+========================= */
+
+async function deleteShipment(
+shipmentNumber
+){
+
+    const confirmDelete =
+    confirm("حذف الشحنة؟");
+
+    if(!confirmDelete) return;
+
+
+
+    await fetch(
+
+        "/delete-shipment",
+
+        {
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                "application/json"
+            },
+
+            body:JSON.stringify({
+
+                shipmentNumber
+
+            })
+
+        }
+
+    );
+
+    loadShipments();
+
+}
+
+
+
+/* =========================
+   طباعة
+========================= */
+
 function printShipment(number){
 
     window.location.href =
-    "/shipment-label.html?number=" + number;
+
+    "/shipment-label.html?number="
+
+    + number;
 
 }
+
+
+
+/* =========================
+   البحث
+========================= */
+
+document
+.getElementById("searchInput")
+
+.addEventListener("input",
+
+function(){
+
+    const value =
+    this.value.toLowerCase();
+
+    const filtered =
+
+    allShipments.filter(
+
+        shipment =>
+
+        shipment.shipmentNumber
+        .toLowerCase()
+        .includes(value)
+
+        ||
+
+        shipment.senderName
+        .toLowerCase()
+        .includes(value)
+
+        ||
+
+        shipment.receiverName
+        .toLowerCase()
+        .includes(value)
+
+    );
+
+    renderShipments(filtered);
+
+});
+
+
 
 loadShipments();
 
